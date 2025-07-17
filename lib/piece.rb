@@ -10,9 +10,11 @@
 # Piece objects contain information about the chess piece and can generate the always-available
 # moves given a coordinate on the grid (assuming no boundaries on the board)
 class Piece
-  attr_reader :moveset, :icon
+  attr_reader :color, :letter, :moveset, :icon
 
-  def initialize(moveset: [], icon: '')
+  def initialize(color: :white, letter: '', moveset: [], icon: '')
+    @color = color
+    @letter = letter
     @moveset = moveset
     @icon = icon
   end
