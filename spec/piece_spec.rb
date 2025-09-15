@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../lib/piece'
+require_relative '../lib/board'
 
 RSpec.describe Piece do
   describe '#to_s' do
