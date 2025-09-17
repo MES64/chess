@@ -10,8 +10,8 @@ RSpec.describe Pawn do
     context 'when the pawn is white' do
       subject(:pawn_white_string) { described_class.new(:white) }
 
-      it 'returns "♙"' do
-        expect(pawn_white_string.to_s).to eql('♙')
+      it 'returns "♟"' do
+        expect(pawn_white_string.to_s).to eql('♟')
       end
     end
 
