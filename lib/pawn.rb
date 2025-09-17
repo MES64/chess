@@ -3,11 +3,10 @@
 # Pawn contains information about a pawn chess piece
 # It can be represented nicely as a string and it can generate it's move set on the board
 class Pawn
-  attr_reader :color, :icon
+  attr_reader :color
 
   def initialize(color)
     @color = color
-    @icon = color == :white ? '♙' : '♟'
   end
 
   def moveset_from(coord:, board:)
@@ -18,7 +17,7 @@ class Pawn
   end
 
   def to_s
-    icon
+    '♟'
   end
 
   private
