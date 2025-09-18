@@ -13,40 +13,40 @@ RSpec.describe Piece do
       context 'when the letter is "R" for Rook' do
         subject(:white_rook_string) { described_class.new(color:, letter: 'R') }
 
-        it 'returns "♖"' do
-          expect(white_rook_string.to_s).to eql('♖')
+        it 'returns "♜"' do
+          expect(white_rook_string.to_s).to eql('♜')
         end
       end
 
       context 'when the letter is "N" for Knight' do
         subject(:white_knight_string) { described_class.new(color:, letter: 'N') }
 
-        it 'returns "♘"' do
-          expect(white_knight_string.to_s).to eql('♘')
+        it 'returns "♞"' do
+          expect(white_knight_string.to_s).to eql('♞')
         end
       end
 
       context 'when the letter is "B" for Bishop' do
         subject(:white_bishop_string) { described_class.new(color:, letter: 'B') }
 
-        it 'returns "♗"' do
-          expect(white_bishop_string.to_s).to eql('♗')
+        it 'returns "♝"' do
+          expect(white_bishop_string.to_s).to eql('♝')
         end
       end
 
       context 'when the letter is "Q" for Queen' do
         subject(:white_queen_string) { described_class.new(color:, letter: 'Q') }
 
-        it 'returns "♕"' do
-          expect(white_queen_string.to_s).to eql('♕')
+        it 'returns "♛"' do
+          expect(white_queen_string.to_s).to eql('♛')
         end
       end
 
       context 'when the letter is "K" for King' do
         subject(:white_king_string) { described_class.new(color:, letter: 'K') }
 
-        it 'returns "♔"' do
-          expect(white_king_string.to_s).to eql('♔')
+        it 'returns "♚"' do
+          expect(white_king_string.to_s).to eql('♚')
         end
       end
     end
