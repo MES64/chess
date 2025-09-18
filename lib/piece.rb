@@ -6,11 +6,11 @@ class Piece
   attr_reader :color, :letter, :icon, :limit, :base_moveset
 
   ICONS = {
-    'R' => { white: '♖', black: '♜' },
-    'N' => { white: '♘', black: '♞' },
-    'B' => { white: '♗', black: '♝' },
-    'Q' => { white: '♕', black: '♛' },
-    'K' => { white: '♔', black: '♚' }
+    'R' => '♜',
+    'N' => '♞',
+    'B' => '♝',
+    'Q' => '♛',
+    'K' => '♚'
   }.freeze
 
   LIMITS = {
@@ -32,7 +32,7 @@ class Piece
   def initialize(color:, letter:)
     @color = color
     @letter = letter
-    @icon = ICONS[letter][color]
+    @icon = ICONS[letter]
     @limit = LIMITS[letter]
     @base_moveset = BASE_MOVESETS[letter]
   end
