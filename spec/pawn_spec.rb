@@ -4,6 +4,26 @@ require_relative '../lib/pawn'
 require_relative '../lib/board'
 
 RSpec.describe Pawn do
+  describe '#print_color' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the pawn is white' do
+      subject(:pawn_white_color) { described_class.new(:white) }
+
+      it 'returns "97"' do
+        expect(pawn_white_color.print_color).to eql('97')
+      end
+    end
+
+    context 'when the pawn is black' do
+      subject(:pawn_black_color) { described_class.new(:black) }
+
+      it 'returns "30"' do
+        expect(pawn_black_color.print_color).to eql('30')
+      end
+    end
+  end
+
   describe '#to_s' do
     # Incoming Query Message -> Test value returned
 
