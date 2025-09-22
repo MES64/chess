@@ -4,6 +4,26 @@ require_relative '../lib/piece'
 require_relative '../lib/board'
 
 RSpec.describe Piece do
+  describe '#print_color' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the color is white' do
+      subject(:piece_white_color) { described_class.new(color: :white, letter: 'R') }
+
+      it 'returns "97"' do
+        expect(piece_white_color.print_color).to eql('97')
+      end
+    end
+
+    context 'when the color is black' do
+      subject(:piece_black_color) { described_class.new(color: :black, letter: 'Q') }
+
+      it 'returns "30"' do
+        expect(piece_black_color.print_color).to eql('30')
+      end
+    end
+  end
+
   describe '#to_s' do
     # Incoming Query Message -> Test value returned
 
