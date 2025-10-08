@@ -1,0 +1,237 @@
+# frozen_string_literal: true
+
+require_relative '../lib/board'
+
+RSpec.describe Board do
+  describe '#print_board' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the color is white' do
+      let(:color) { :white }
+
+      context 'when the board is empty' do
+        let(:grid_empty) do
+          [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+        end
+
+        subject(:board_empty_white) { described_class.new(grid: grid_empty) }
+
+        it 'returns an empty board string from white side' do
+          expected_string = <<~BOARD
+            8 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            7 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            6 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            5 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            4 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            3 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            2 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            1 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+              a b c d e f g h
+          BOARD
+          actual_string = board_empty_white.print_board(color:)
+          expect(actual_string).to eql(expected_string)
+        end
+      end
+
+      context 'when the board is set up to start a game of Chess' do
+        let(:black_rook) { instance_double('Piece') }
+        let(:black_knight) { instance_double('Piece') }
+        let(:black_bishop) { instance_double('Piece') }
+        let(:black_queen) { instance_double('Piece') }
+        let(:black_king) { instance_double('Piece') }
+
+        let(:white_rook) { instance_double('Piece') }
+        let(:white_knight) { instance_double('Piece') }
+        let(:white_bishop) { instance_double('Piece') }
+        let(:white_queen) { instance_double('Piece') }
+        let(:white_king) { instance_double('Piece') }
+
+        let(:black_pawn) { instance_double('Pawn') }
+        let(:white_pawn) { instance_double('Pawn') }
+
+        before do
+          allow(black_rook).to receive(:to_s).and_return('♜')
+          allow(black_knight).to receive(:to_s).and_return('♞')
+          allow(black_bishop).to receive(:to_s).and_return('♝')
+          allow(black_queen).to receive(:to_s).and_return('♛')
+          allow(black_king).to receive(:to_s).and_return('♚')
+          allow(black_pawn).to receive(:to_s).and_return('♟')
+
+          allow(white_rook).to receive(:to_s).and_return('♜')
+          allow(white_knight).to receive(:to_s).and_return('♞')
+          allow(white_bishop).to receive(:to_s).and_return('♝')
+          allow(white_queen).to receive(:to_s).and_return('♛')
+          allow(white_king).to receive(:to_s).and_return('♚')
+          allow(white_pawn).to receive(:to_s).and_return('♟')
+
+          allow(black_rook).to receive(:print_color).and_return('30')
+          allow(black_knight).to receive(:print_color).and_return('30')
+          allow(black_bishop).to receive(:print_color).and_return('30')
+          allow(black_queen).to receive(:print_color).and_return('30')
+          allow(black_king).to receive(:print_color).and_return('30')
+          allow(black_pawn).to receive(:print_color).and_return('30')
+
+          allow(white_rook).to receive(:print_color).and_return('97')
+          allow(white_knight).to receive(:print_color).and_return('97')
+          allow(white_bishop).to receive(:print_color).and_return('97')
+          allow(white_queen).to receive(:print_color).and_return('97')
+          allow(white_king).to receive(:print_color).and_return('97')
+          allow(white_pawn).to receive(:print_color).and_return('97')
+        end
+
+        let(:grid_start) do
+          [[black_rook, black_knight, black_bishop, black_queen, black_king, black_bishop, black_knight, black_rook],
+           [black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn],
+           [white_rook, white_knight, white_bishop, white_queen, white_king, white_bishop, white_knight, white_rook]]
+        end
+
+        subject(:board_start_white) { described_class.new(grid: grid_start) }
+
+        it 'returns a starting board string from white side' do
+          expected_string = <<~BOARD
+            8 \e[30;104m♜ \e[30;44m♞ \e[30;104m♝ \e[30;44m♛ \e[30;104m♚ \e[30;44m♝ \e[30;104m♞ \e[30;44m♜ \e[0m
+            7 \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[0m
+            6 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            5 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            4 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            3 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            2 \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[0m
+            1 \e[97;44m♜ \e[97;104m♞ \e[97;44m♝ \e[97;104m♛ \e[97;44m♚ \e[97;104m♝ \e[97;44m♞ \e[97;104m♜ \e[0m
+              a b c d e f g h
+          BOARD
+          actual_string = board_start_white.print_board(color:)
+          expect(actual_string).to eql(expected_string)
+        end
+      end
+    end
+
+    context 'when the color is black' do
+      let(:color) { :black }
+
+      context 'when the board is empty' do
+        let(:grid_empty) do
+          [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+        end
+
+        subject(:board_empty_black) { described_class.new(grid: grid_empty) }
+
+        it 'returns an empty board string from black side' do
+          expected_string = <<~BOARD
+            1 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            2 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            3 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            4 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            5 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            6 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            7 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            8 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+              h g f e d c b a
+          BOARD
+          actual_string = board_empty_black.print_board(color:)
+          expect(actual_string).to eql(expected_string)
+        end
+      end
+
+      context 'when the board is set up to start a game of Chess' do
+        let(:black_rook) { instance_double('Piece') }
+        let(:black_knight) { instance_double('Piece') }
+        let(:black_bishop) { instance_double('Piece') }
+        let(:black_queen) { instance_double('Piece') }
+        let(:black_king) { instance_double('Piece') }
+
+        let(:white_rook) { instance_double('Piece') }
+        let(:white_knight) { instance_double('Piece') }
+        let(:white_bishop) { instance_double('Piece') }
+        let(:white_queen) { instance_double('Piece') }
+        let(:white_king) { instance_double('Piece') }
+
+        let(:black_pawn) { instance_double('Pawn') }
+        let(:white_pawn) { instance_double('Pawn') }
+
+        before do
+          allow(black_rook).to receive(:to_s).and_return('♜')
+          allow(black_knight).to receive(:to_s).and_return('♞')
+          allow(black_bishop).to receive(:to_s).and_return('♝')
+          allow(black_queen).to receive(:to_s).and_return('♛')
+          allow(black_king).to receive(:to_s).and_return('♚')
+          allow(black_pawn).to receive(:to_s).and_return('♟')
+
+          allow(white_rook).to receive(:to_s).and_return('♜')
+          allow(white_knight).to receive(:to_s).and_return('♞')
+          allow(white_bishop).to receive(:to_s).and_return('♝')
+          allow(white_queen).to receive(:to_s).and_return('♛')
+          allow(white_king).to receive(:to_s).and_return('♚')
+          allow(white_pawn).to receive(:to_s).and_return('♟')
+
+          allow(black_rook).to receive(:print_color).and_return('30')
+          allow(black_knight).to receive(:print_color).and_return('30')
+          allow(black_bishop).to receive(:print_color).and_return('30')
+          allow(black_queen).to receive(:print_color).and_return('30')
+          allow(black_king).to receive(:print_color).and_return('30')
+          allow(black_pawn).to receive(:print_color).and_return('30')
+
+          allow(white_rook).to receive(:print_color).and_return('97')
+          allow(white_knight).to receive(:print_color).and_return('97')
+          allow(white_bishop).to receive(:print_color).and_return('97')
+          allow(white_queen).to receive(:print_color).and_return('97')
+          allow(white_king).to receive(:print_color).and_return('97')
+          allow(white_pawn).to receive(:print_color).and_return('97')
+        end
+
+        let(:grid_start) do
+          [[black_rook, black_knight, black_bishop, black_queen, black_king, black_bishop, black_knight, black_rook],
+           [black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn, black_pawn],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn, white_pawn],
+           [white_rook, white_knight, white_bishop, white_queen, white_king, white_bishop, white_knight, white_rook]]
+        end
+
+        subject(:board_start_black) { described_class.new(grid: grid_start) }
+
+        it 'returns a starting board string from black side' do
+          expected_string = <<~BOARD
+            1 \e[97;104m♜ \e[97;44m♞ \e[97;104m♝ \e[97;44m♚ \e[97;104m♛ \e[97;44m♝ \e[97;104m♞ \e[97;44m♜ \e[0m
+            2 \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[97;44m♟ \e[97;104m♟ \e[0m
+            3 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            4 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            5 \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[0m
+            6 \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[44m  \e[104m  \e[0m
+            7 \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[30;104m♟ \e[30;44m♟ \e[0m
+            8 \e[30;44m♜ \e[30;104m♞ \e[30;44m♝ \e[30;104m♚ \e[30;44m♛ \e[30;104m♝ \e[30;44m♞ \e[30;104m♜ \e[0m
+              h g f e d c b a
+          BOARD
+          actual_string = board_start_black.print_board(color:)
+          expect(actual_string).to eql(expected_string)
+        end
+      end
+    end
+  end
+end
+
+# Notes:
+# - Maybe refactor them for coord. Maybe hash or swap coordinate indexes. Could do later...
+# - Can also think about a ' ' piece for empty squares to send the print_color message, etc.
+# - Don't worry about any more refactoring now; better to finish the project and see what the refactoring
+#   should be from there (if it is even worth doing). For now, just add private methods to simplify!
