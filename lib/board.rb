@@ -1,0 +1,40 @@
+# frozen_string_literal: true
+
+# Board contains the grid of chess pieces, along with en passant and castling information
+# Methods: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
+class Board
+  attr_reader :grid
+
+  def initialize(grid:)
+    @grid = grid
+  end
+
+  def print_board(color:)
+    letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
+
+    rows = grid.each_with_index.map do |row, index|
+      "#{grid.length - index} #{print_row(row, index, color)}\e[0m\n"
+    end
+    board_string = color == :white ? rows.join : rows.reverse.join
+    "#{board_string}  #{letters}\n"
+  end
+
+  private
+
+  def print_row(row, index, color)
+    square_color = index.even? ? '44' : '104'
+    squares = row.map do |piece|
+      square_color = square_color == '104' ? '44' : '104'
+      print_square(piece, square_color)
+    end
+    color == :white ? squares.join : squares.reverse.join
+  end
+
+  def print_square(piece, square_color)
+    "\e[#{print_color(piece)}#{square_color}m#{piece} "
+  end
+
+  def print_color(piece)
+    piece == ' ' ? '' : "#{piece.print_color};"
+  end
+end
