@@ -228,6 +228,67 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#off_grid?' do
+    # Incoming Query Message -> Test value returned
+
+    let(:grid_empty) do
+      [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    end
+
+    subject(:board_off_grid) { described_class.new(grid: grid_empty) }
+
+    it 'returns false for coordinate [2, 3]' do
+      expect(board_off_grid).to_not be_off_grid [2, 3]
+    end
+
+    it 'returns false for coordinate [0, 0]' do
+      expect(board_off_grid).to_not be_off_grid [0, 0]
+    end
+
+    it 'returns false for coordinate [0, 7]' do
+      expect(board_off_grid).to_not be_off_grid [0, 7]
+    end
+
+    it 'returns false for coordinate [7, 0]' do
+      expect(board_off_grid).to_not be_off_grid [7, 0]
+    end
+
+    it 'returns false for coordinate [7, 7]' do
+      expect(board_off_grid).to_not be_off_grid [7, 7]
+    end
+
+    it 'returns true for coordinate [-2, -3]' do
+      expect(board_off_grid).to be_off_grid [-2, -3]
+    end
+
+    it 'returns true for coordinate [-1, 0]' do
+      expect(board_off_grid).to be_off_grid [-1, 0]
+    end
+
+    it 'returns true for coordinate [0, -1]' do
+      expect(board_off_grid).to be_off_grid [0, -1]
+    end
+
+    it 'returns true for coordinate [100, 208]' do
+      expect(board_off_grid).to be_off_grid [100, 208]
+    end
+
+    it 'returns true for coordinate [7, 8]' do
+      expect(board_off_grid).to be_off_grid [7, 8]
+    end
+
+    it 'returns true for coordinate [8, 7]' do
+      expect(board_off_grid).to be_off_grid [8, 7]
+    end
+  end
 end
 
 # Notes:
