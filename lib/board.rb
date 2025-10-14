@@ -9,6 +9,10 @@ class Board
     @grid = grid
   end
 
+  def off_grid?(coord)
+    coord[0].negative? || coord[1].negative? || coord[0] > 7 || coord[1] > 7
+  end
+
   def print_board(color:)
     letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
 
