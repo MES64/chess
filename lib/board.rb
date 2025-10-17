@@ -13,6 +13,10 @@ class Board
     coord[0].negative? || coord[1].negative? || coord[0] > 7 || coord[1] > 7
   end
 
+  def empty_at?(coord)
+    grid_at(coord) == ' '
+  end
+
   def print_board(color:)
     letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
 
@@ -24,6 +28,14 @@ class Board
   end
 
   private
+
+  def grid_at(coord)
+    row = grid.length - 1 - coord[1]
+    column = coord[0]
+    return if row.negative? || column.negative?
+
+    grid.dig(row, column)
+  end
 
   def print_row(row, index, color)
     square_color = index.even? ? '44' : '104'
