@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative '../lib/board'
+require_relative '../lib/pawn'
+require_relative '../lib/piece'
 
 RSpec.describe Board do
   describe '#print_board' do
@@ -287,6 +289,76 @@ RSpec.describe Board do
 
     it 'returns true for coordinate [8, 7]' do
       expect(board_off_grid).to be_off_grid [8, 7]
+    end
+  end
+
+  describe '#empty_at?' do
+    # Incoming Query Message -> Test value returned
+
+    let(:black_rook) { instance_double('Piece') }
+    let(:white_knight) { instance_double('Piece') }
+    let(:black_pawn) { instance_double('Pawn') }
+    let(:white_pawn) { instance_double('Pawn') }
+
+    let(:grid_empty_at) do
+      [[black_rook, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', black_pawn, ' '],
+       [' ', ' ', white_knight, ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    end
+
+    subject(:board_empty_at) { described_class.new(grid: grid_empty_at) }
+
+    it 'returns true for an empty square at [0, 2]' do
+      expect(board_empty_at).to be_empty_at [0, 2]
+    end
+
+    it 'returns true for an empty square at [7, 7]' do
+      expect(board_empty_at).to be_empty_at [7, 7]
+    end
+
+    it 'returns false for a white pawn at [0, 1]' do
+      expect(board_empty_at).to_not be_empty_at [0, 1]
+    end
+
+    it 'returns false for a white knight at [2, 4]' do
+      expect(board_empty_at).to_not be_empty_at [2, 4]
+    end
+
+    it 'returns false for a black pawn at [6, 5]' do
+      expect(board_empty_at).to_not be_empty_at [6, 5]
+    end
+
+    it 'returns false for a black rook at [0, 7]' do
+      expect(board_empty_at).to_not be_empty_at [0, 7]
+    end
+
+    it 'returns false for no square at [-1, 0]' do
+      expect(board_empty_at).to_not be_empty_at [-1, 0]
+    end
+
+    it 'returns false for no square at [0, -1]' do
+      expect(board_empty_at).to_not be_empty_at [0, -1]
+    end
+
+    it 'returns false for no square at [-1, -1]' do
+      expect(board_empty_at).to_not be_empty_at [-1, -1]
+    end
+
+    it 'returns false for no square at [8, 7]' do
+      expect(board_empty_at).to_not be_empty_at [8, 7]
+    end
+
+    it 'returns false for no square at [7, 8]' do
+      expect(board_empty_at).to_not be_empty_at [7, 8]
+    end
+
+    it 'returns false for no square at [8, 8]' do
+      expect(board_empty_at).to_not be_empty_at [8, 8]
     end
   end
 end
