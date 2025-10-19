@@ -17,6 +17,12 @@ class Board
     grid_at(coord) == ' '
   end
 
+  def piece_at?(coord, color_wanted)
+    return false if empty_at?(coord) || off_grid?(coord)
+
+    grid_at(coord).color == color_wanted
+  end
+
   def print_board(color:)
     letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
 
