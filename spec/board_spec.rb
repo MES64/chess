@@ -361,6 +361,95 @@ RSpec.describe Board do
       expect(board_empty_at).to_not be_empty_at [8, 8]
     end
   end
+
+  describe '#piece_at?' do
+    # Incoming Query Message -> Test value returned
+
+    let(:black_rook) { instance_double('Piece') }
+    let(:white_knight) { instance_double('Piece') }
+    let(:black_pawn) { instance_double('Pawn') }
+    let(:white_pawn) { instance_double('Pawn') }
+
+    before do
+      allow(black_rook).to receive(:color).and_return(:black)
+      allow(white_knight).to receive(:color).and_return(:white)
+      allow(black_pawn).to receive(:color).and_return(:black)
+      allow(white_pawn).to receive(:color).and_return(:white)
+    end
+
+    let(:grid_piece_at) do
+      [[black_rook, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', black_pawn, ' '],
+       [' ', ' ', white_knight, ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+       [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+    end
+
+    subject(:board_piece_at) { described_class.new(grid: grid_piece_at) }
+
+    context 'when looking for a white piece' do
+      it 'returns false for an empty square at [0, 2]' do
+        expect(board_piece_at).to_not be_piece_at([0, 2], :white)
+      end
+
+      it 'returns false for an empty square at [7, 7]' do
+        expect(board_piece_at).to_not be_piece_at([7, 7], :white)
+      end
+
+      it 'returns true for a white pawn at [0, 1]' do
+        expect(board_piece_at).to be_piece_at([0, 1], :white)
+      end
+
+      it 'returns true for a white knight at [2, 4]' do
+        expect(board_piece_at).to be_piece_at([2, 4], :white)
+      end
+
+      it 'returns false for a black pawn at [6, 5]' do
+        expect(board_piece_at).to_not be_piece_at([6, 5], :white)
+      end
+
+      it 'returns false for a black rook at [0, 7]' do
+        expect(board_piece_at).to_not be_piece_at([0, 7], :white)
+      end
+
+      it 'returns false for no square at [-1, 0]' do
+        expect(board_piece_at).to_not be_piece_at([-1, 0], :white)
+      end
+    end
+
+    context 'when looking for a black piece' do
+      it 'returns false for an empty square at [0, 2]' do
+        expect(board_piece_at).to_not be_piece_at([0, 2], :black)
+      end
+
+      it 'returns false for an empty square at [7, 7]' do
+        expect(board_piece_at).to_not be_piece_at([7, 7], :black)
+      end
+
+      it 'returns false for a white pawn at [0, 1]' do
+        expect(board_piece_at).to_not be_piece_at([0, 1], :black)
+      end
+
+      it 'returns false for a white knight at [2, 4]' do
+        expect(board_piece_at).to_not be_piece_at([2, 4], :black)
+      end
+
+      it 'returns true for a black pawn at [6, 5]' do
+        expect(board_piece_at).to be_piece_at([6, 5], :black)
+      end
+
+      it 'returns true for a black rook at [0, 7]' do
+        expect(board_piece_at).to be_piece_at([0, 7], :black)
+      end
+
+      it 'returns false for no square at [-1, 0]' do
+        expect(board_piece_at).to_not be_piece_at([-1, 0], :black)
+      end
+    end
+  end
 end
 
 # Notes:
