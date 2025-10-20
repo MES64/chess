@@ -10,7 +10,7 @@ class Board
   end
 
   def off_grid?(coord)
-    coord[0].negative? || coord[1].negative? || coord[0] > 7 || coord[1] > 7
+    grid_at(coord).nil?
   end
 
   def empty_at?(coord)
