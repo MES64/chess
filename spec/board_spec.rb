@@ -450,9 +450,213 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#moveset' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the board is empty' do
+      let(:grid_empty) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_empty_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+
+      it 'returns { white: [], black: [] }' do
+        actual_moveset = board_empty_moveset.moveset
+        expect(actual_moveset).to match({ white: [], black: [] })
+      end
+    end
+
+    context 'when the board contains only a white pawn at a2' do
+      let(:white_pawn) { instance_double('Pawn') }
+
+      let(:grid_white_pawn) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_white_pawn_moveset) { described_class.new(grid: grid_white_pawn, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+
+      before do
+        allow(white_pawn).to receive(:color).and_return(:white)
+        allow(white_pawn).to receive(:moveset_from).with(coord: [0, 1], board: board_white_pawn_moveset).and_return(%w[a2-a3 a2-a4])
+      end
+
+      it 'returns { white: ["a2-a3", "a2-a4"], black: [] }' do
+        actual_moveset = board_white_pawn_moveset.moveset
+        expect(actual_moveset).to match({ white: contain_exactly('a2-a3', 'a2-a4'), black: [] })
+      end
+    end
+
+    context 'when the board contains a white queen at c3, a black bishop at g3, and a black knight at e5' do
+      let(:white_queen) { instance_double('Piece') }
+      let(:black_bishop) { instance_double('Piece') }
+      let(:black_knight) { instance_double('Piece') }
+
+      let(:white_queen_moveset) do
+        %w[Qc3-b2 Qc3-a1
+           Qc3-d4 Qc3xe5
+           Qc3-d2 Qc3-e1
+           Qc3-b4 Qc3-a5
+           Qc3-b3 Qc3-a3
+           Qc3-d3 Qc3-e3 Qc3-f3 Qc3xg3
+           Qc3-c2 Qc3-c1
+           Qc3-c4 Qc3-c5 Qc3-c6 Qc3-c7 Qc3-c8]
+      end
+
+      let(:black_bishop_moveset) do
+        %w[Bg3-f2 Bg3-e1
+           Bg3-h4
+           Bg3-h2
+           Bg3-f4]
+      end
+
+      let(:black_knight_moveset) { %w[Ne5-d3 Ne5-f3 Ne5-c4 Ne5-g4 Ne5-c6 Ne5-g6 Ne5-d7 Ne5-f7] }
+
+      let(:grid_three_pieces) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', black_knight, ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', white_queen, ' ', ' ', ' ', black_bishop, ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_three_pieces_moveset) { described_class.new(grid: grid_three_pieces, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+
+      before do
+        allow(white_queen).to receive(:color).and_return(:white)
+        allow(black_bishop).to receive(:color).and_return(:black)
+        allow(black_knight).to receive(:color).and_return(:black)
+
+        allow(white_queen).to receive(:moveset_from).with(coord: [2, 2], board: board_three_pieces_moveset).and_return(white_queen_moveset)
+        allow(black_bishop).to receive(:moveset_from).with(coord: [6, 2], board: board_three_pieces_moveset).and_return(black_bishop_moveset)
+        allow(black_knight).to receive(:moveset_from).with(coord: [4, 4], board: board_three_pieces_moveset).and_return(black_knight_moveset)
+      end
+
+      it 'returns { white: white_queen_moveset, black: black_bishop_moveset + black_knight_moveset }' do
+        actual_moveset = board_three_pieces_moveset.moveset
+        expect(actual_moveset).to match({ white: contain_exactly(*white_queen_moveset), black: contain_exactly(*(black_bishop_moveset + black_knight_moveset)) })
+      end
+    end
+
+    context 'when there are castling moves only: castling = { white: ["O-O", "O-O-O"], black: ["O-O-O"] }' do
+      let(:grid_empty) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_castling_moveset) { described_class.new(grid: grid_empty, castling: { white: %w[O-O O-O-O], black: %w[O-O-O] }, en_passant: { white: [], black: [] }) }
+
+      it 'returns { white: ["O-O", "O-O-O"], black: ["O-O-O"] }' do
+        actual_moveset = board_castling_moveset.moveset
+        expect(actual_moveset).to match({ white: contain_exactly('O-O', 'O-O-O'), black: ['O-O-O'] })
+      end
+    end
+
+    context 'when there are en passant moves only: en_passant = { white: [], black: ["c4xb3"] }' do
+      let(:grid_empty) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_en_passant_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: %w[c4xb3] }) }
+
+      it 'returns { white: [], black: ["c4xb3"] }' do
+        actual_moveset = board_en_passant_moveset.moveset
+        expect(actual_moveset).to match({ white: [], black: %w[c4xb3] })
+      end
+    end
+
+    context 'when there are normal, castling, and en passant moves all together' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:white_king) { instance_double('Piece') }
+      let(:white_rook) { instance_double('Piece') }
+      let(:black_knight) { instance_double('Piece') }
+
+      let(:white_pawn_moveset) { %w[b5-b6 b5xa6] }
+
+      let(:black_pawn_moveset) { %w[c5-c4] }
+
+      let(:white_king_moveset) { %w[Ke1-d1 Ke1-d2 Ke1-e2 Ke1-f2 Ke1-f1] }
+
+      let(:white_rook_moveset) do
+        %w[Rh1-g1 Rh1-f1
+           Rh1-h2 Rh1-h3 Rh1-h4 Rh1-h5 Rh1-h6 Rh1-h7 Rh1-h8]
+      end
+
+      let(:black_knight_moveset) { %w[Na6-b4 Na6-c7 Na6-b8] }
+
+      let(:grid_all) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [black_knight, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', white_pawn, black_pawn, ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+      end
+
+      subject(:board_all_moveset) { described_class.new(grid: grid_all, castling: { white: %w[O-O], black: [] }, en_passant: { white: %w[b5xc6], black: [] }) }
+
+      before do
+        allow(white_pawn).to receive(:color).and_return(:white)
+        allow(black_pawn).to receive(:color).and_return(:black)
+        allow(white_king).to receive(:color).and_return(:white)
+        allow(white_rook).to receive(:color).and_return(:white)
+        allow(black_knight).to receive(:color).and_return(:black)
+
+        allow(white_pawn).to receive(:moveset_from).with(coord: [1, 4], board: board_all_moveset).and_return(white_pawn_moveset)
+        allow(black_pawn).to receive(:moveset_from).with(coord: [2, 4], board: board_all_moveset).and_return(black_pawn_moveset)
+        allow(white_king).to receive(:moveset_from).with(coord: [4, 0], board: board_all_moveset).and_return(white_king_moveset)
+        allow(white_rook).to receive(:moveset_from).with(coord: [7, 0], board: board_all_moveset).and_return(white_rook_moveset)
+        allow(black_knight).to receive(:moveset_from).with(coord: [0, 5], board: board_all_moveset).and_return(black_knight_moveset)
+      end
+
+      it 'returns { white: white_piece_moveset + ["O-O"] + ["b5xc6"], black: black_piece_moveset }' do
+        white_piece_moveset = white_pawn_moveset + white_king_moveset + white_rook_moveset
+        black_piece_moveset = black_pawn_moveset + black_knight_moveset
+        actual_moveset = board_all_moveset.moveset
+        expect(actual_moveset).to match({ white: contain_exactly(*(white_piece_moveset + ['O-O'] + ['b5xc6'])), black: contain_exactly(*black_piece_moveset) })
+      end
+    end
+  end
 end
 
 # Notes:
+# - Write separate tests for default Board instance variables
+# - Refactor letters in #print_board to be more general
+#
 # - Maybe refactor them for coord. Maybe hash or swap coordinate indexes. Could do later...
 # - Can also think about a ' ' piece for empty squares to send the print_color message, etc.
 # - Don't worry about any more refactoring now; better to finish the project and see what the refactoring
