@@ -2,11 +2,14 @@
 
 # Board contains the grid of chess pieces, along with en passant and castling information
 # Methods: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
+# castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] }, en_passant: []
 class Board
-  attr_reader :grid
+  attr_reader :grid, :castling, :en_passant
 
-  def initialize(grid:)
+  def initialize(grid:, castling: nil, en_passant: nil)
     @grid = grid
+    @castling = castling
+    @en_passant = en_passant
   end
 
   def off_grid?(coord)
@@ -23,6 +26,10 @@ class Board
     grid_at(coord).color == color_wanted
   end
 
+  def moveset
+    { white: color_moveset(:white), black: color_moveset(:black) }
+  end
+
   def print_board(color:)
     letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
 
@@ -34,6 +41,29 @@ class Board
   end
 
   private
+
+  def color_moveset(color)
+    pieces_moveset(color) + castling[color] + en_passant[color]
+  end
+
+  def pieces_moveset(color)
+    moveset = []
+    coords.each { |coord| moveset += piece_moveset(coord) if piece_at?(coord, color) }
+    moveset
+  end
+
+  def piece_moveset(coord)
+    grid_at(coord).moveset_from(coord:, board: self)
+  end
+
+  def coords
+    rows = (0...grid.length)
+    columns = (0...grid[0].length)
+
+    coords = []
+    rows.each { |row| coords += columns.map { |column| [row, column] } }
+    coords
+  end
 
   def grid_at(coord)
     row = grid.length - 1 - coord[1]
