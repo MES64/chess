@@ -651,13 +651,509 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#update_grid' do
+    # Incoming Command Message -> Test change of observable state
+
+    context 'when the grid is empty' do
+      let(:grid_empty) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_empty_update_grid) { described_class.new(grid: grid_empty) }
+
+      it 'updates the grid to be empty for the move "a2-a3"' do
+        expected_grid = grid_empty
+
+        board_empty_update_grid.update_grid('a2-a3')
+        actual_grid = board_empty_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+    end
+
+    context 'when the grid only contains a white pawn at a2' do
+      let(:white_pawn) { instance_double('Pawn') }
+
+      let(:grid_pawn) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_pawn_update_grid) { described_class.new(grid: grid_pawn) }
+
+      it 'updates the grid by moving the pawn from a2 to a3 for the move "a2-a3"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_pawn_update_grid.update_grid('a2-a3')
+        actual_grid = board_pawn_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+    end
+
+    context 'when the grid has a few pieces: normal and taking moves' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:black_king) { instance_double('Piece') }
+      let(:black_rook) { instance_double('Piece') }
+      let(:black_queen) { instance_double('Piece') }
+      let(:black_knight) { instance_double('Piece') }
+      let(:white_rook) { instance_double('Piece') }
+      let(:white_king) { instance_double('Piece') }
+
+      let(:grid_few) do
+        [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [black_queen, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+      end
+
+      subject(:board_few_update_grid) { described_class.new(grid: grid_few) }
+
+      it 'updates the grid by moving the black knight from d4 to e6 for the move "Nd4-e6"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+                         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_queen, ' ', ' ', ' ', black_knight, ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+                         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+
+        board_few_update_grid.update_grid('Nd4-e6')
+        actual_grid = board_few_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by the black queen capturing from a6 to a7 for the move "Qa6xa7"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+                         [black_queen, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+                         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+
+        board_few_update_grid.update_grid('Qa6xa7')
+        actual_grid = board_few_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+    end
+
+    context 'when the grid has a few pieces: check and checkmate moves' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:black_king) { instance_double('Piece') }
+      let(:black_rook) { instance_double('Piece') }
+      let(:black_queen) { instance_double('Piece') }
+      let(:black_knight) { instance_double('Piece') }
+      let(:white_rook) { instance_double('Piece') }
+      let(:white_king) { instance_double('Piece') }
+
+      let(:grid_few) do
+        [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [black_queen, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+      end
+
+      subject(:board_few_update_grid) { described_class.new(grid: grid_few) }
+
+      it 'updates the grid by moving the white rook from h1 to f1 with check for the move "Rh1-f1+"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+                         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_queen, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+                         [white_rook, ' ', ' ', ' ', white_king, white_rook, ' ', ' ']]
+
+        board_few_update_grid.update_grid('Rh1-f1+')
+        actual_grid = board_few_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by the black rook capturing from h8 to h1 with check for the move "Rh8xh1+"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_queen, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', white_pawn, ' ', ' ', ' '],
+                         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', black_rook]]
+
+        board_few_update_grid.update_grid('Rh8xh1+')
+        actual_grid = board_few_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by the black queen capturing from a6 to e2 with checkmate for the move "Qa6xe2#"' do
+        expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
+                         [white_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_pawn, white_pawn, ' ', ' ', ' '],
+                         [' ', ' ', ' ', black_knight, ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [white_pawn, ' ', ' ', ' ', black_queen, ' ', ' ', ' '],
+                         [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+
+        board_few_update_grid.update_grid('Qa6xe2#')
+        actual_grid = board_few_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+    end
+
+    context 'when the grid has a few pieces: pawn promotion' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:black_knight) { instance_double('Piece') }
+      let(:black_king) { instance_double('Piece') }
+      let(:white_rook) { instance_double('Piece') }
+      let(:white_king) { instance_double('Piece') }
+
+      let(:white_bishop) { instance_double('Piece') }
+      let(:white_knight) { instance_double('Piece') }
+      let(:white_queen) { instance_double('Piece') }
+
+      let(:black_bishop) { instance_double('Piece') }
+      let(:black_rook) { instance_double('Piece') }
+      let(:black_queen) { instance_double('Piece') }
+
+      let(:grid_promotion) do
+        [[' ', black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+         [white_pawn, white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [black_pawn, ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      let(:letter_to_piece) do
+        { white: { 'B' => white_bishop, 'N' => white_knight, 'R' => white_rook, 'Q' => white_queen },
+          black: { 'B' => black_bishop, 'N' => black_knight, 'R' => black_rook, 'Q' => black_queen } }
+      end
+
+      subject(:board_promotion_update_grid) { described_class.new(grid: grid_promotion, letter_to_piece:) }
+
+      before do
+        allow(white_pawn).to receive(:color).and_return(:white)
+        allow(black_pawn).to receive(:color).and_return(:black)
+        allow(black_knight).to receive(:color).and_return(:black)
+        allow(black_king).to receive(:color).and_return(:black)
+        allow(white_rook).to receive(:color).and_return(:white)
+        allow(white_king).to receive(:color).and_return(:white)
+        allow(white_bishop).to receive(:color).and_return(:white)
+        allow(white_knight).to receive(:color).and_return(:white)
+        allow(white_queen).to receive(:color).and_return(:white)
+        allow(black_bishop).to receive(:color).and_return(:black)
+        allow(black_rook).to receive(:color).and_return(:black)
+        allow(black_queen).to receive(:color).and_return(:black)
+      end
+
+      it 'updates the grid by promoting the white pawn from a7 to a white bishop on a8 for the move "a7-a8=B"' do
+        expected_grid = [[white_bishop, black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_pawn, ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a7-a8=B')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the white pawn from a7 to a white knight on a8 for the move "a7-a8=N"' do
+        expected_grid = [[white_knight, black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_pawn, ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a7-a8=N')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the white pawn (by capturing) from a7 to a white rook on b8 with checkmate for the move "a7xb8=R#"' do
+        expected_grid = [[' ', white_rook, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_pawn, ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a7xb8=R#')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the white pawn (by capturing) from a7 to a white queen on b8 with checkmate for the move "a7xb8=Q#"' do
+        expected_grid = [[' ', white_queen, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [black_pawn, ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [' ', white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a7xb8=Q#')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the black pawn from a2 to a black queen on a1 for the move "a2-a1=Q"' do
+        expected_grid = [[' ', black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [white_pawn, white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [black_queen, white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a2-a1=Q')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the black pawn from a2 to a black rook on a1 for the move "a2-a1=R"' do
+        expected_grid = [[' ', black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [white_pawn, white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [black_rook, white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a2-a1=R')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the black pawn from a2 to a black knight on a1 with check for the move "a2-a1=N+"' do
+        expected_grid = [[' ', black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [white_pawn, white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [black_knight, white_rook, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a2-a1=N+')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+
+      it 'updates the grid by promoting the black pawn (by capturing) from a2 to a black bishop on b1 with check for the move "a2xb1=B+"' do
+        expected_grid = [[' ', black_knight, ' ', ' ', ' ', black_king, ' ', ' '],
+                         [white_pawn, white_rook, ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                         [' ', ' ', white_king, ' ', ' ', ' ', ' ', ' '],
+                         [' ', black_bishop, ' ', ' ', ' ', ' ', ' ', ' ']]
+
+        board_promotion_update_grid.update_grid('a2xb1=B+')
+        actual_grid = board_promotion_update_grid.grid
+        expect(actual_grid).to eql(expected_grid)
+      end
+    end
+
+    context 'when the grid has a few pieces: Castling and En Passant' do
+      context 'when white pieces are moved' do
+        let(:white_pawn) { instance_double('Pawn') }
+        let(:black_pawn) { instance_double('Pawn') }
+
+        let(:black_king) { instance_double('Piece') }
+        let(:white_rook) { instance_double('Piece') }
+        let(:white_king) { instance_double('Piece') }
+
+        let(:grid_few) do
+          [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', black_pawn, white_pawn, ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+        end
+
+        subject(:board_white_update_grid) { described_class.new(grid: grid_few) }
+
+        it 'updates the grid by doing white queen-side castling for the move "O-O-Ow"' do
+          expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', black_pawn, white_pawn, ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', white_king, white_rook, ' ', ' ', ' ', white_rook]]
+
+          board_white_update_grid.update_grid('O-O-Ow')
+          actual_grid = board_white_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+
+        it 'updates the grid by doing white king-side castling with check for the move "O-O+w"' do
+          expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', black_pawn, white_pawn, ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [white_rook, ' ', ' ', ' ', ' ', white_rook, white_king, ' ']]
+
+          board_white_update_grid.update_grid('O-O+w')
+          actual_grid = board_white_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+
+        it 'updates the grid by the white pawn on c5 taking the black pawn on b5 en passant for the move "c5xb6"' do
+          expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', white_pawn, ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
+
+          board_white_update_grid.update_grid('c5xb6')
+          actual_grid = board_white_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+      end
+
+      context 'when black pieces are moved' do
+        let(:white_pawn) { instance_double('Pawn') }
+        let(:black_pawn) { instance_double('Pawn') }
+
+        let(:black_king) { instance_double('Piece') }
+        let(:black_rook) { instance_double('Piece') }
+        let(:black_queen) { instance_double('Piece') }
+        let(:white_king) { instance_double('Piece') }
+
+        let(:grid_few) do
+          [[black_rook, ' ', ' ', ' ', black_king, ' ', ' ', black_rook],
+           [' ', ' ', ' ', ' ', black_queen, ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', black_pawn, white_pawn, ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+           [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
+        end
+
+        subject(:board_black_update_grid) { described_class.new(grid: grid_few) }
+
+        it 'updates the grid by doing black queen-side castling for the move "O-O-Ob"' do
+          expected_grid = [[' ', ' ', black_king, black_rook, ' ', ' ', ' ', black_rook],
+                           [' ', ' ', ' ', ' ', black_queen, ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', black_pawn, white_pawn, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
+
+          board_black_update_grid.update_grid('O-O-Ob')
+          actual_grid = board_black_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+
+        it 'updates the grid by doing black king-side castling for the move "O-Ob"' do
+          expected_grid = [[black_rook, ' ', ' ', ' ', ' ', black_rook, black_king, ' '],
+                           [' ', ' ', ' ', ' ', black_queen, ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', black_pawn, white_pawn, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
+
+          board_black_update_grid.update_grid('O-Ob')
+          actual_grid = board_black_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+
+        it 'updates the grid by the black pawn on e4 taking the white pawn on f4 en passant with check for the move "e4xf3+"' do
+          expected_grid = [[black_rook, ' ', ' ', ' ', black_king, ' ', ' ', black_rook],
+                           [' ', ' ', ' ', ' ', black_queen, ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', black_pawn, ' ', ' '],
+                           [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                           [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
+
+          board_black_update_grid.update_grid('e4xf3+')
+          actual_grid = board_black_update_grid.grid
+          expect(actual_grid).to eql(expected_grid)
+        end
+      end
+    end
+  end
 end
 
 # Notes:
-# - Write separate tests for default Board instance variables
-# - Refactor letters in #print_board to be more general
+# - Rewrite README for altered reversible algebraic form (no need to note the piece taking)
+# - For 50 move and 3-fold rules for declaring a draw, need move and state history stored in Game
+# - Write separate tests for default Board instance variables:
+#     Treat initialize as a script method and test default values of instance variables
+#     and outgoing command messages to create piece instance variables.
 #
 # - Maybe refactor them for coord. Maybe hash or swap coordinate indexes. Could do later...
 # - Can also think about a ' ' piece for empty squares to send the print_color message, etc.
+# - Could think about a refactor in Board; Grid class? Plenty of private methods and could contain pieces
 # - Don't worry about any more refactoring now; better to finish the project and see what the refactoring
 #   should be from there (if it is even worth doing). For now, just add private methods to simplify!
