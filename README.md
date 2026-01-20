@@ -14,15 +14,15 @@ From The Odin Project: https://www.theodinproject.com/lessons/ruby-ruby-final-pr
 
 ### Move Notation
 
-Each move is input in reversible-algebraic form: https://en.wikipedia.org/wiki/Chess_notation
+Each move is input in an altered reversible-algebraic form, where the piece taken is ignored in the notation: https://en.wikipedia.org/wiki/Chess_notation
 
-This makes for easier transfer of information from human to computer (with no piece ambiguity). It also allows for the potential to move forwards and backwards through a list of moves and update the board accordingly. 
+This makes for easier transfer of information from human to computer (with no piece ambiguity).  
 
 #### Examples: 
 - e2-e4
 - Ng1-f3
 - Bf8-b4+
-- Bb5xNc6
+- Bb5xc6
 - 0-0
 - 0-0-0
 - Ng8-f6#
