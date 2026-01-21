@@ -6,7 +6,7 @@
 class Board
   attr_reader :grid, :castling, :en_passant, :letter_to_piece
 
-  def initialize(grid:, castling: nil, en_passant: nil, letter_to_piece: nil)
+  def initialize(grid: nil, castling: nil, en_passant: nil, letter_to_piece: nil)
     @grid = grid
     @castling = castling
     @en_passant = en_passant
@@ -37,6 +37,14 @@ class Board
     else
       move_piece(move)
     end
+  end
+
+  def update_castling(move)
+    # Matches for Rook moves, taking a Rook, King moves, and Castling moves
+    castling[:white].delete('O-O-O') if move.match?(/Ra1|xa1|Ke1|O-O.*w/)
+    castling[:white].delete('O-O') if move.match?(/Rh1|xh1|Ke1|O-O.*w/)
+    castling[:black].delete('O-O-O') if move.match?(/Ra8|xa8|Ke8|O-O.*b/)
+    castling[:black].delete('O-O') if move.match?(/Rh8|xh8|Ke8|O-O.*b/)
   end
 
   def print_board(color:)
