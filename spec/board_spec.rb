@@ -1143,10 +1143,187 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#update_castling' do
+    # Incoming Command Message -> Test change of observable state
+
+    context 'when castling is empty' do
+      let(:castling_empty) { { white: [], black: [] } }
+
+      subject(:board_empty_update_castling) { described_class.new(castling: castling_empty) }
+
+      it 'updates castling to { white: [], black: [] } for the move "b2-b3"' do
+        board_empty_update_castling.update_castling('b2-b3')
+        actual_castling = board_empty_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: [] })
+      end
+    end
+
+    context 'when castling contains one move for white' do
+      let(:castling_one_move) { { white: ['O-O-O'], black: [] } }
+
+      subject(:board_one_move_update_castling) { described_class.new(castling: castling_one_move) }
+
+      it 'updates castling to { white: ["O-O-O"], black: [] } for the move "b2-b3"' do
+        board_one_move_update_castling.update_castling('b2-b3')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: [] } for the move "b7-b5"' do
+        board_one_move_update_castling.update_castling('b7-b5')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: [] })
+      end
+
+      it 'updates castling to { white: [], black: [] } for the move "O-O-O+w"' do
+        board_one_move_update_castling.update_castling('O-O-O+w')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: [] })
+      end
+
+      it 'updates castling to { white: [], black: [] } for the move "Ra1-b1"' do
+        board_one_move_update_castling.update_castling('Ra1-b1')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: [] } for the move "Rh1-g1"' do
+        board_one_move_update_castling.update_castling('Rh1-g1')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: [] })
+      end
+
+      it 'updates castling to { white: [], black: [] } for the move "Ke1-f2"' do
+        board_one_move_update_castling.update_castling('Ke1-f2')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: [] } for the move "Ke8-d8"' do
+        board_one_move_update_castling.update_castling('Ke8-d8')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: [] })
+      end
+
+      it 'updates castling to { white: [], black: [] } for the move "Qa8xa1+"' do
+        board_one_move_update_castling.update_castling('Qa8xa1+')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: [] } for the move "Qh8xh1"' do
+        board_one_move_update_castling.update_castling('Qh8xh1')
+        actual_castling = board_one_move_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: [] })
+      end
+    end
+
+    context 'when castling contains full castling moves' do
+      let(:castling_full) { { white: %w[O-O O-O-O], black: %w[O-O O-O-O] } }
+
+      subject(:board_full_update_castling) { described_class.new(castling: castling_full) }
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O", "O-O-O"] } for the move "b2-b3"' do
+        board_full_update_castling.update_castling('b2-b3')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O", "O-O-O"] } for the move "b7-b5"' do
+        board_full_update_castling.update_castling('b7-b5')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: [], black: ["O-O", "O-O-O"] } for the move "O-O-Ow"' do
+        board_full_update_castling.update_castling('O-O-Ow')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: [], black: ["O-O", "O-O-O"] } for the move "O-Ow"' do
+        board_full_update_castling.update_castling('O-Ow')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: [] } for the move "O-O-Ob"' do
+        board_full_update_castling.update_castling('O-O-Ob')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: [] } for the move "O-Ob"' do
+        board_full_update_castling.update_castling('O-Ob')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: [] })
+      end
+
+      it 'updates castling to { white: [], black: ["O-O", "O-O-O"] } for the move "Ke1-f2"' do
+        board_full_update_castling.update_castling('Ke1-f2')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: [], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: [] } for the move "Ke8-d8"' do
+        board_full_update_castling.update_castling('Ke8-d8')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: [] })
+      end
+
+      it 'updates castling to { white: ["O-O"], black: ["O-O", "O-O-O"] } for the move "Ra1-b1"' do
+        board_full_update_castling.update_castling('Ra1-b1')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O'], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: ["O-O", "O-O-O"] } for the move "Rh1-g1"' do
+        board_full_update_castling.update_castling('Rh1-g1')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O"] } for the move "Ra8-b8"' do
+        board_full_update_castling.update_castling('Ra8-b8')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: ['O-O'] })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O-O"] } for the move "Rh8-g8"' do
+        board_full_update_castling.update_castling('Rh8-g8')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: ['O-O-O'] })
+      end
+
+      it 'updates castling to { white: ["O-O"], black: ["O-O"] } for the move "Ra1xa8"' do
+        board_full_update_castling.update_castling('Ra1xa8')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O'], black: ['O-O'] })
+      end
+
+      it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O-O"] } for the move "Qh2xh8+"' do
+        board_full_update_castling.update_castling('Qh2xh8+')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: contain_exactly('O-O', 'O-O-O'), black: ['O-O-O'] })
+      end
+
+      it 'updates castling to { white: ["O-O"], black: ["O-O", "O-O-O"] } for the move "Bg7xa1"' do
+        board_full_update_castling.update_castling('Bg7xa1')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O'], black: contain_exactly('O-O', 'O-O-O') })
+      end
+
+      it 'updates castling to { white: ["O-O-O"], black: ["O-O-O"] } for the move "Rh8xh1#"' do
+        board_full_update_castling.update_castling('Rh8xh1#')
+        actual_castling = board_full_update_castling.castling
+        expect(actual_castling).to match({ white: ['O-O-O'], black: ['O-O-O'] })
+      end
+    end
+  end
 end
 
 # Notes:
-# - Rewrite README for altered reversible algebraic form (no need to note the piece taking)
 # - For 50 move and 3-fold rules for declaring a draw, need move and state history stored in Game
 # - Write separate tests for default Board instance variables:
 #     Treat initialize as a script method and test default values of instance variables
