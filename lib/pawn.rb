@@ -26,6 +26,10 @@ class Pawn
     [move_to_s(coord, take_left(coord), 'x')]
   end
 
+  def en_passant_right(coord)
+    [move_to_s(coord, take_right(coord), 'x')]
+  end
+
   def to_s
     '♟'
   end
