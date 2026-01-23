@@ -349,4 +349,36 @@ RSpec.describe Pawn do
       end
     end
   end
+
+  describe '#en_passant_right' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the pawn is white' do
+      subject(:pawn_white_en_passant_right) { described_class.new(:white) }
+
+      it 'returns ["a5xb6"] for coord a5/[0, 4]' do
+        en_passant_right = pawn_white_en_passant_right.en_passant_right([0, 4])
+        expect(en_passant_right).to eql(['a5xb6'])
+      end
+
+      it 'returns ["g5xh6"] for coord g5/[6, 4]' do
+        en_passant_right = pawn_white_en_passant_right.en_passant_right([6, 4])
+        expect(en_passant_right).to eql(['g5xh6'])
+      end
+    end
+
+    context 'when the pawn is black' do
+      subject(:pawn_black_en_passant_right) { described_class.new(:black) }
+
+      it 'returns ["a4xb3"] for coord a4/[0, 3]' do
+        en_passant_right = pawn_black_en_passant_right.en_passant_right([0, 3])
+        expect(en_passant_right).to eql(['a4xb3'])
+      end
+
+      it 'returns ["g4xh3"] for coord g4/[6, 3]' do
+        en_passant_right = pawn_black_en_passant_right.en_passant_right([6, 3])
+        expect(en_passant_right).to eql(['g4xh3'])
+      end
+    end
+  end
 end
