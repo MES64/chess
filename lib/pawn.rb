@@ -22,6 +22,10 @@ class Pawn
     moveset
   end
 
+  def en_passant_left(coord)
+    [move_to_s(coord, take_left(coord), 'x')]
+  end
+
   def to_s
     '♟'
   end
