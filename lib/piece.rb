@@ -49,6 +49,10 @@ class Piece
     moveset
   end
 
+  def en_passant_left(coord)
+    []
+  end
+
   def to_s
     icon
   end
