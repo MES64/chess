@@ -621,4 +621,36 @@ RSpec.describe Piece do
       end
     end
   end
+
+  describe '#en_passant_right' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the piece is a white Rook' do
+      subject(:white_rook_en_passant_right) { described_class.new(color: :white, letter: 'R') }
+
+      it 'returns [] for coord a5/[0, 4]' do
+        en_passant_right = white_rook_en_passant_right.en_passant_right([0, 4])
+        expect(en_passant_right).to eql([])
+      end
+
+      it 'returns [] for coord g5/[6, 4]' do
+        en_passant_right = white_rook_en_passant_right.en_passant_right([6, 4])
+        expect(en_passant_right).to eql([])
+      end
+    end
+
+    context 'when the piece is a black Knight' do
+      subject(:black_knight_en_passant_right) { described_class.new(color: :black, letter: 'N') }
+
+      it 'returns [] for coord a4/[0, 3]' do
+        en_passant_right = black_knight_en_passant_right.en_passant_right([0, 3])
+        expect(en_passant_right).to eql([])
+      end
+
+      it 'returns [] for coord g4/[6, 3]' do
+        en_passant_right = black_knight_en_passant_right.en_passant_right([6, 3])
+        expect(en_passant_right).to eql([])
+      end
+    end
+  end
 end
