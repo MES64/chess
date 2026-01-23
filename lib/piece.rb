@@ -53,6 +53,10 @@ class Piece
     []
   end
 
+  def en_passant_right(coord)
+    []
+  end
+
   def to_s
     icon
   end
