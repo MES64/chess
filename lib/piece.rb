@@ -49,11 +49,11 @@ class Piece
     moveset
   end
 
-  def en_passant_left(coord)
+  def en_passant_left(_coord)
     []
   end
 
-  def en_passant_right(coord)
+  def en_passant_right(_coord)
     []
   end
 
