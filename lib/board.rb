@@ -33,6 +33,12 @@ class Board
     { white: color_moveset(:white), black: color_moveset(:black) }
   end
 
+  def update(move)
+    update_en_passant(move)
+    update_castling(move)
+    update_grid(move)
+  end
+
   def update_grid(move)
     if move.include?('O-O')
       castle(move)
