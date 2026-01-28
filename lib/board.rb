@@ -2,9 +2,11 @@
 
 # Board contains the grid of chess pieces, along with en passant and castling information
 # Methods: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
-# castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] }, en_passant: []
+# castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] }, en_passant: { white: [], black: ["c4xb3"] }
+# I would ideally shorten this class, possibly by making a separate grid class
 class Board
-  attr_reader :grid, :castling, :en_passant, :letter_to_piece
+  attr_reader :grid, :castling, :letter_to_piece
+  attr_accessor :en_passant
 
   def initialize(grid: nil, castling: nil, en_passant: nil, letter_to_piece: nil)
     @grid = grid
@@ -47,6 +49,11 @@ class Board
     castling[:black].delete('O-O') if move.match?(/Rh8|xh8|Ke8|O-O.*b/)
   end
 
+  def update_en_passant(move)
+    self.en_passant = { white: [], black: [] }
+    add_en_passant(move) if pawn_moved_forward_two?(move)
+  end
+
   def print_board(color:)
     letters = { white: 'a b c d e f g h', black: 'h g f e d c b a' }[color]
 
@@ -58,6 +65,33 @@ class Board
   end
 
   private
+
+  def add_en_passant(move)
+    left_coord = left_coord_of_moved_pawn(move)
+    right_coord = right_coord_of_moved_pawn(move)
+    color = white_pawn_moved_forward_two?(move) ? :black : :white
+    # Piece can be sent en_passant messages too, and always return []
+    en_passant[color] += grid_at(left_coord).en_passant_right(left_coord) if piece_at?(left_coord, color)
+    en_passant[color] += grid_at(right_coord).en_passant_left(right_coord) if piece_at?(right_coord, color)
+  end
+
+  def left_coord_of_moved_pawn(move)
+    finish_coord = finish_coord(move)
+    [finish_coord[0] - 1, finish_coord[1]]
+  end
+
+  def right_coord_of_moved_pawn(move)
+    finish_coord = finish_coord(move)
+    [finish_coord[0] + 1, finish_coord[1]]
+  end
+
+  def pawn_moved_forward_two?(move)
+    move.match?(/^[a-h](2|7)-[a-h](4|5)/)
+  end
+
+  def white_pawn_moved_forward_two?(move)
+    move.match?(/^[a-h]2-[a-h]4/)
+  end
 
   def castle(move)
     rank = move.end_with?('w') ? '1' : '8'
