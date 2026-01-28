@@ -1321,6 +1321,256 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#update_en_passant' do
+    # Incoming Command Message -> Test change of observable state
+
+    context 'when it is the white player turn' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:black_king) { instance_double('Piece') }
+      let(:white_queen) { instance_double('Piece') }
+      let(:white_king) { instance_double('Piece') }
+
+      let(:grid_white) do
+        [[' ', ' ', ' ', ' ', black_king, ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', black_pawn, white_pawn, black_pawn, white_pawn, ' '],
+         [black_pawn, ' ', black_pawn, ' ', ' ', ' ', ' ', ' '],
+         [black_pawn, ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', white_pawn, ' ', white_pawn, white_queen, ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
+      end
+
+      before do
+        allow(black_pawn).to receive(:color).and_return(:black)
+        allow(black_pawn).to receive(:en_passant_left).with([2, 3]).and_return(['c4xb3'])
+        allow(black_pawn).to receive(:en_passant_right).with([0, 3]).and_return(['a4xb3'])
+        allow(black_pawn).to receive(:en_passant_right).with([2, 3]).and_return(['c4xd3'])
+      end
+
+      context 'when there are no En Passant moves: { white: [], black: [] }' do
+        let(:en_passant_white_none) { { white: [], black: [] } }
+
+        subject(:board_white_none) { described_class.new(grid: grid_white, en_passant: en_passant_white_none) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
+          board_white_none.update_en_passant('Qe2-g4')
+          actual_en_passant = board_white_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "b2-b3"' do
+          board_white_none.update_en_passant('b2-b3')
+          actual_en_passant = board_white_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "Ke1-f1"' do
+          board_white_none.update_en_passant('Ke1-f1')
+          actual_en_passant = board_white_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["c4xd3"] } for the move "d2-d4"' do
+          board_white_none.update_en_passant('d2-d4')
+          actual_en_passant = board_white_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: ['c4xd3'] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["a4xb3", "c4xb3"] } for the move "b2-b4"' do
+          board_white_none.update_en_passant('b2-b4')
+          actual_en_passant = board_white_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: contain_exactly('a4xb3', 'c4xb3') })
+        end
+      end
+
+      context 'when there is one En Passant move: { white: ["e5xd6"], black: [] }' do
+        let(:en_passant_white_one) { { white: ['e5xd6'], black: [] } }
+
+        subject(:board_white_one) { described_class.new(grid: grid_white, en_passant: en_passant_white_one) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
+          board_white_one.update_en_passant('Qe2-g4')
+          actual_en_passant = board_white_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "e5xd6+"' do
+          board_white_one.update_en_passant('e5xd6+')
+          actual_en_passant = board_white_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["c4xd3"] } for the move "d2-d4"' do
+          board_white_one.update_en_passant('d2-d4')
+          actual_en_passant = board_white_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: ['c4xd3'] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["a4xb3", "c4xb3"] } for the move "b2-b4"' do
+          board_white_one.update_en_passant('b2-b4')
+          actual_en_passant = board_white_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: contain_exactly('a4xb3', 'c4xb3') })
+        end
+      end
+
+      context 'when there are two En Passant moves: { white: ["e5xf6", "g5xf6"], black: [] }' do
+        let(:en_passant_white_two) { { white: %w[e5xf6 g5xf6], black: [] } }
+
+        subject(:board_white_two) { described_class.new(grid: grid_white, en_passant: en_passant_white_two) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
+          board_white_two.update_en_passant('Qe2-g4')
+          actual_en_passant = board_white_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "e5xf6+"' do
+          board_white_two.update_en_passant('e5xf6+')
+          actual_en_passant = board_white_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "g5xf6"' do
+          board_white_two.update_en_passant('g5xf6')
+          actual_en_passant = board_white_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["c4xd3"] } for the move "d2-d4"' do
+          board_white_two.update_en_passant('d2-d4')
+          actual_en_passant = board_white_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: ['c4xd3'] })
+        end
+
+        it 'updates en_passant to { white: [], black: ["a4xb3", "c4xb3"] } for the move "b2-b4"' do
+          board_white_two.update_en_passant('b2-b4')
+          actual_en_passant = board_white_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: contain_exactly('a4xb3', 'c4xb3') })
+        end
+      end
+    end
+
+    context 'when it is the black player turn' do
+      let(:white_pawn) { instance_double('Pawn') }
+      let(:black_pawn) { instance_double('Pawn') }
+
+      let(:black_king) { instance_double('Piece') }
+      let(:white_king) { instance_double('Piece') }
+      let(:black_rook) { instance_double('Piece') }
+
+      let(:grid_black) do
+        [[' ', ' ', ' ', ' ', black_king, ' ', ' ', ' '],
+         [white_king, ' ', ' ', black_pawn, black_rook, black_pawn, ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', white_pawn, ' ', white_pawn, ' '],
+         [black_pawn, white_pawn, black_pawn, white_pawn, ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      before do
+        allow(white_pawn).to receive(:color).and_return(:white)
+        allow(white_pawn).to receive(:en_passant_left).with([4, 4]).and_return(['e5xd6'])
+        allow(white_pawn).to receive(:en_passant_left).with([6, 4]).and_return(['g5xf6'])
+        allow(white_pawn).to receive(:en_passant_right).with([4, 4]).and_return(['e5xf6'])
+      end
+
+      context 'when there are no En Passant moves: { white: [], black: [] }' do
+        let(:en_passant_black_none) { { white: [], black: [] } }
+
+        subject(:board_black_none) { described_class.new(grid: grid_black, en_passant: en_passant_black_none) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
+          board_black_none.update_en_passant('d7-d6+')
+          actual_en_passant = board_black_none.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xd6"], black: [] } for the move "d7-d5+"' do
+          board_black_none.update_en_passant('d7-d5+')
+          actual_en_passant = board_black_none.en_passant
+          expect(actual_en_passant).to match({ white: ['e5xd6'], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xf6", "g5xf6"], black: [] } for the move "f7-f5"' do
+          board_black_none.update_en_passant('f7-f5')
+          actual_en_passant = board_black_none.en_passant
+          expect(actual_en_passant).to match({ white: contain_exactly('e5xf6', 'g5xf6'), black: [] })
+        end
+      end
+
+      context 'when there is one En Passant move: { white: [], black: ["c4xd3"] }' do
+        let(:en_passant_black_one) { { white: [], black: ['c4xd3'] } }
+
+        subject(:board_black_one) { described_class.new(grid: grid_black, en_passant: en_passant_black_one) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
+          board_black_one.update_en_passant('d7-d6+')
+          actual_en_passant = board_black_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "c4xd3"' do
+          board_black_one.update_en_passant('c4xd3')
+          actual_en_passant = board_black_one.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xd6"], black: [] } for the move "d7-d5+"' do
+          board_black_one.update_en_passant('d7-d5+')
+          actual_en_passant = board_black_one.en_passant
+          expect(actual_en_passant).to match({ white: ['e5xd6'], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xf6", "g5xf6"], black: [] } for the move "f7-f5"' do
+          board_black_one.update_en_passant('f7-f5')
+          actual_en_passant = board_black_one.en_passant
+          expect(actual_en_passant).to match({ white: contain_exactly('e5xf6', 'g5xf6'), black: [] })
+        end
+      end
+
+      context 'when there are two En Passant moves: { white: [], black: ["a4xb3", "c4xb3"] }' do
+        let(:en_passant_black_two) { { white: [], black: %w[a4xb3 c4xb3] } }
+
+        subject(:board_black_two) { described_class.new(grid: grid_black, en_passant: en_passant_black_two) }
+
+        it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
+          board_black_two.update_en_passant('d7-d6+')
+          actual_en_passant = board_black_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "a4xb3"' do
+          board_black_two.update_en_passant('a4xb3')
+          actual_en_passant = board_black_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: [], black: [] } for the move "c4xb3"' do
+          board_black_two.update_en_passant('c4xb3')
+          actual_en_passant = board_black_two.en_passant
+          expect(actual_en_passant).to match({ white: [], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xd6"], black: [] } for the move "d7-d5+"' do
+          board_black_two.update_en_passant('d7-d5+')
+          actual_en_passant = board_black_two.en_passant
+          expect(actual_en_passant).to match({ white: ['e5xd6'], black: [] })
+        end
+
+        it 'updates en_passant to { white: ["e5xf6", "g5xf6"], black: [] } for the move "f7-f5"' do
+          board_black_two.update_en_passant('f7-f5')
+          actual_en_passant = board_black_two.en_passant
+          expect(actual_en_passant).to match({ white: contain_exactly('e5xf6', 'g5xf6'), black: [] })
+        end
+      end
+    end
+  end
 end
 
 # Notes:
