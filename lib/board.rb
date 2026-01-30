@@ -1,14 +1,47 @@
 # frozen_string_literal: true
 
+require_relative 'piece'
+require_relative 'pawn'
+
 # Board contains the grid of chess pieces, along with en passant and castling information
 # Methods: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
-# castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] }, en_passant: { white: [], black: ["c4xb3"] }
 # I would ideally shorten this class, possibly by making a separate grid class
 class Board
   attr_reader :grid, :castling, :letter_to_piece
   attr_accessor :en_passant
 
-  def initialize(grid: nil, castling: nil, en_passant: nil, letter_to_piece: nil)
+  WHITE_PAWN = Pawn.new(:white)
+  WHITE_ROOK = Piece.new(color: :white, letter: 'R')
+  WHITE_KNIGHT = Piece.new(color: :white, letter: 'N')
+  WHITE_BISHOP = Piece.new(color: :white, letter: 'B')
+  WHITE_QUEEN = Piece.new(color: :white, letter: 'Q')
+  WHITE_KING = Piece.new(color: :white, letter: 'K')
+
+  BLACK_PAWN = Pawn.new(:black)
+  BLACK_ROOK = Piece.new(color: :black, letter: 'R')
+  BLACK_KNIGHT = Piece.new(color: :black, letter: 'N')
+  BLACK_BISHOP = Piece.new(color: :black, letter: 'B')
+  BLACK_QUEEN = Piece.new(color: :black, letter: 'Q')
+  BLACK_KING = Piece.new(color: :black, letter: 'K')
+
+  DEFAULT_LETTER_TO_PIECE = {
+    white: { 'B' => WHITE_BISHOP, 'N' => WHITE_KNIGHT, 'R' => WHITE_ROOK, 'Q' => WHITE_QUEEN },
+    black: { 'B' => BLACK_BISHOP, 'N' => BLACK_KNIGHT, 'R' => BLACK_ROOK, 'Q' => BLACK_QUEEN }
+  }.freeze
+
+  DEFAULT_GRID = [
+    [BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
+    [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+    [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
+    [WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK]
+  ].freeze
+
+  def initialize(grid: DEFAULT_GRID, castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] },
+                 en_passant: { white: [], black: [] }, letter_to_piece: DEFAULT_LETTER_TO_PIECE)
     @grid = grid
     @castling = castling
     @en_passant = en_passant
