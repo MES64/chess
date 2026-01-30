@@ -23,7 +23,7 @@ RSpec.describe Board do
            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
         end
 
-        subject(:board_empty_white) { described_class.new(grid: grid_empty) }
+        subject(:board_empty_white) { described_class.new(grid: grid_empty, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'returns an empty board string from white side' do
           expected_string = <<~BOARD
@@ -99,7 +99,7 @@ RSpec.describe Board do
            [white_rook, white_knight, white_bishop, white_queen, white_king, white_bishop, white_knight, white_rook]]
         end
 
-        subject(:board_start_white) { described_class.new(grid: grid_start) }
+        subject(:board_start_white) { described_class.new(grid: grid_start, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'returns a starting board string from white side' do
           expected_string = <<~BOARD
@@ -134,7 +134,7 @@ RSpec.describe Board do
            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
         end
 
-        subject(:board_empty_black) { described_class.new(grid: grid_empty) }
+        subject(:board_empty_black) { described_class.new(grid: grid_empty, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'returns an empty board string from black side' do
           expected_string = <<~BOARD
@@ -210,7 +210,7 @@ RSpec.describe Board do
            [white_rook, white_knight, white_bishop, white_queen, white_king, white_bishop, white_knight, white_rook]]
         end
 
-        subject(:board_start_black) { described_class.new(grid: grid_start) }
+        subject(:board_start_black) { described_class.new(grid: grid_start, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'returns a starting board string from black side' do
           expected_string = <<~BOARD
@@ -245,7 +245,7 @@ RSpec.describe Board do
        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
     end
 
-    subject(:board_off_grid) { described_class.new(grid: grid_empty) }
+    subject(:board_off_grid) { described_class.new(grid: grid_empty, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
     it 'returns false for coordinate [2, 3]' do
       expect(board_off_grid).to_not be_off_grid [2, 3]
@@ -311,7 +311,7 @@ RSpec.describe Board do
        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
     end
 
-    subject(:board_empty_at) { described_class.new(grid: grid_empty_at) }
+    subject(:board_empty_at) { described_class.new(grid: grid_empty_at, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
     it 'returns true for an empty square at [0, 2]' do
       expect(board_empty_at).to be_empty_at [0, 2]
@@ -388,7 +388,7 @@ RSpec.describe Board do
        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
     end
 
-    subject(:board_piece_at) { described_class.new(grid: grid_piece_at) }
+    subject(:board_piece_at) { described_class.new(grid: grid_piece_at, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
     context 'when looking for a white piece' do
       it 'returns false for an empty square at [0, 2]' do
@@ -466,7 +466,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_empty_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+      subject(:board_empty_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }, letter_to_piece: nil) }
 
       it 'returns { white: [], black: [] }' do
         actual_moveset = board_empty_moveset.moveset
@@ -488,7 +488,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_white_pawn_moveset) { described_class.new(grid: grid_white_pawn, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+      subject(:board_white_pawn_moveset) { described_class.new(grid: grid_white_pawn, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }, letter_to_piece: nil) }
 
       before do
         allow(white_pawn).to receive(:color).and_return(:white)
@@ -537,7 +537,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_three_pieces_moveset) { described_class.new(grid: grid_three_pieces, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }) }
+      subject(:board_three_pieces_moveset) { described_class.new(grid: grid_three_pieces, castling: { white: [], black: [] }, en_passant: { white: [], black: [] }, letter_to_piece: nil) }
 
       before do
         allow(white_queen).to receive(:color).and_return(:white)
@@ -567,7 +567,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_castling_moveset) { described_class.new(grid: grid_empty, castling: { white: %w[O-O O-O-O], black: %w[O-O-O] }, en_passant: { white: [], black: [] }) }
+      subject(:board_castling_moveset) { described_class.new(grid: grid_empty, castling: { white: %w[O-O O-O-O], black: %w[O-O-O] }, en_passant: { white: [], black: [] }, letter_to_piece: nil) }
 
       it 'returns { white: ["O-O", "O-O-O"], black: ["O-O-O"] }' do
         actual_moveset = board_castling_moveset.moveset
@@ -587,7 +587,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_en_passant_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: %w[c4xb3] }) }
+      subject(:board_en_passant_moveset) { described_class.new(grid: grid_empty, castling: { white: [], black: [] }, en_passant: { white: [], black: %w[c4xb3] }, letter_to_piece: nil) }
 
       it 'returns { white: [], black: ["c4xb3"] }' do
         actual_moveset = board_en_passant_moveset.moveset
@@ -627,7 +627,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
       end
 
-      subject(:board_all_moveset) { described_class.new(grid: grid_all, castling: { white: %w[O-O], black: [] }, en_passant: { white: %w[b5xc6], black: [] }) }
+      subject(:board_all_moveset) { described_class.new(grid: grid_all, castling: { white: %w[O-O], black: [] }, en_passant: { white: %w[b5xc6], black: [] }, letter_to_piece: nil) }
 
       before do
         allow(white_pawn).to receive(:color).and_return(:white)
@@ -667,7 +667,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_empty_update_grid) { described_class.new(grid: grid_empty) }
+      subject(:board_empty_update_grid) { described_class.new(grid: grid_empty, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates the grid to be empty for the move "a2-a3"' do
         expected_grid = grid_empty
@@ -692,7 +692,7 @@ RSpec.describe Board do
          [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
       end
 
-      subject(:board_pawn_update_grid) { described_class.new(grid: grid_pawn) }
+      subject(:board_pawn_update_grid) { described_class.new(grid: grid_pawn, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates the grid by moving the pawn from a2 to a3 for the move "a2-a3"' do
         expected_grid = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -732,7 +732,7 @@ RSpec.describe Board do
          [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
       end
 
-      subject(:board_few_update_grid) { described_class.new(grid: grid_few) }
+      subject(:board_few_update_grid) { described_class.new(grid: grid_few, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates the grid by moving the black knight from d4 to e6 for the move "Nd4-e6"' do
         expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
@@ -787,7 +787,7 @@ RSpec.describe Board do
          [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
       end
 
-      subject(:board_few_update_grid) { described_class.new(grid: grid_few) }
+      subject(:board_few_update_grid) { described_class.new(grid: grid_few, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates the grid by moving the white rook from h1 to f1 with check for the move "Rh1-f1+"' do
         expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', black_rook],
@@ -868,7 +868,7 @@ RSpec.describe Board do
           black: { 'B' => black_bishop, 'N' => black_knight, 'R' => black_rook, 'Q' => black_queen } }
       end
 
-      subject(:board_promotion_update_grid) { described_class.new(grid: grid_promotion, letter_to_piece:) }
+      subject(:board_promotion_update_grid) { described_class.new(grid: grid_promotion, castling: nil, en_passant: nil, letter_to_piece:) }
 
       before do
         allow(white_pawn).to receive(:color).and_return(:white)
@@ -1026,7 +1026,7 @@ RSpec.describe Board do
            [white_rook, ' ', ' ', ' ', white_king, ' ', ' ', white_rook]]
         end
 
-        subject(:board_white_update_grid) { described_class.new(grid: grid_few) }
+        subject(:board_white_update_grid) { described_class.new(grid: grid_few, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'updates the grid by doing white queen-side castling for the move "O-O-Ow"' do
           expected_grid = [[' ', ' ', ' ', ' ', ' ', black_king, ' ', ' '],
@@ -1094,7 +1094,7 @@ RSpec.describe Board do
            [' ', ' ', ' ', ' ', white_king, ' ', ' ', ' ']]
         end
 
-        subject(:board_black_update_grid) { described_class.new(grid: grid_few) }
+        subject(:board_black_update_grid) { described_class.new(grid: grid_few, castling: nil, en_passant: nil, letter_to_piece: nil) }
 
         it 'updates the grid by doing black queen-side castling for the move "O-O-Ob"' do
           expected_grid = [[' ', ' ', black_king, black_rook, ' ', ' ', ' ', black_rook],
@@ -1150,7 +1150,7 @@ RSpec.describe Board do
     context 'when castling is empty' do
       let(:castling_empty) { { white: [], black: [] } }
 
-      subject(:board_empty_update_castling) { described_class.new(castling: castling_empty) }
+      subject(:board_empty_update_castling) { described_class.new(grid: nil, castling: castling_empty, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates castling to { white: [], black: [] } for the move "b2-b3"' do
         board_empty_update_castling.update_castling('b2-b3')
@@ -1162,7 +1162,7 @@ RSpec.describe Board do
     context 'when castling contains one move for white' do
       let(:castling_one_move) { { white: ['O-O-O'], black: [] } }
 
-      subject(:board_one_move_update_castling) { described_class.new(castling: castling_one_move) }
+      subject(:board_one_move_update_castling) { described_class.new(grid: nil, castling: castling_one_move, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates castling to { white: ["O-O-O"], black: [] } for the move "b2-b3"' do
         board_one_move_update_castling.update_castling('b2-b3')
@@ -1222,7 +1222,7 @@ RSpec.describe Board do
     context 'when castling contains full castling moves' do
       let(:castling_full) { { white: %w[O-O O-O-O], black: %w[O-O O-O-O] } }
 
-      subject(:board_full_update_castling) { described_class.new(castling: castling_full) }
+      subject(:board_full_update_castling) { described_class.new(grid: nil, castling: castling_full, en_passant: nil, letter_to_piece: nil) }
 
       it 'updates castling to { white: ["O-O", "O-O-O"], black: ["O-O", "O-O-O"] } for the move "b2-b3"' do
         board_full_update_castling.update_castling('b2-b3')
@@ -1354,7 +1354,7 @@ RSpec.describe Board do
       context 'when there are no En Passant moves: { white: [], black: [] }' do
         let(:en_passant_white_none) { { white: [], black: [] } }
 
-        subject(:board_white_none) { described_class.new(grid: grid_white, en_passant: en_passant_white_none) }
+        subject(:board_white_none) { described_class.new(grid: grid_white, castling: nil, en_passant: en_passant_white_none, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
           board_white_none.update_en_passant('Qe2-g4')
@@ -1390,7 +1390,7 @@ RSpec.describe Board do
       context 'when there is one En Passant move: { white: ["e5xd6"], black: [] }' do
         let(:en_passant_white_one) { { white: ['e5xd6'], black: [] } }
 
-        subject(:board_white_one) { described_class.new(grid: grid_white, en_passant: en_passant_white_one) }
+        subject(:board_white_one) { described_class.new(grid: grid_white, castling: nil, en_passant: en_passant_white_one, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
           board_white_one.update_en_passant('Qe2-g4')
@@ -1420,7 +1420,7 @@ RSpec.describe Board do
       context 'when there are two En Passant moves: { white: ["e5xf6", "g5xf6"], black: [] }' do
         let(:en_passant_white_two) { { white: %w[e5xf6 g5xf6], black: [] } }
 
-        subject(:board_white_two) { described_class.new(grid: grid_white, en_passant: en_passant_white_two) }
+        subject(:board_white_two) { described_class.new(grid: grid_white, castling: nil, en_passant: en_passant_white_two, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "Qe2-g4"' do
           board_white_two.update_en_passant('Qe2-g4')
@@ -1483,7 +1483,7 @@ RSpec.describe Board do
       context 'when there are no En Passant moves: { white: [], black: [] }' do
         let(:en_passant_black_none) { { white: [], black: [] } }
 
-        subject(:board_black_none) { described_class.new(grid: grid_black, en_passant: en_passant_black_none) }
+        subject(:board_black_none) { described_class.new(grid: grid_black, castling: nil, en_passant: en_passant_black_none, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
           board_black_none.update_en_passant('d7-d6+')
@@ -1507,7 +1507,7 @@ RSpec.describe Board do
       context 'when there is one En Passant move: { white: [], black: ["c4xd3"] }' do
         let(:en_passant_black_one) { { white: [], black: ['c4xd3'] } }
 
-        subject(:board_black_one) { described_class.new(grid: grid_black, en_passant: en_passant_black_one) }
+        subject(:board_black_one) { described_class.new(grid: grid_black, castling: nil, en_passant: en_passant_black_one, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
           board_black_one.update_en_passant('d7-d6+')
@@ -1537,7 +1537,7 @@ RSpec.describe Board do
       context 'when there are two En Passant moves: { white: [], black: ["a4xb3", "c4xb3"] }' do
         let(:en_passant_black_two) { { white: [], black: %w[a4xb3 c4xb3] } }
 
-        subject(:board_black_two) { described_class.new(grid: grid_black, en_passant: en_passant_black_two) }
+        subject(:board_black_two) { described_class.new(grid: grid_black, castling: nil, en_passant: en_passant_black_two, letter_to_piece: nil) }
 
         it 'updates en_passant to { white: [], black: [] } for the move "d7-d6+"' do
           board_black_two.update_en_passant('d7-d6+')
@@ -1578,6 +1578,9 @@ end
 # - Write separate tests for default Board instance variables:
 #     Treat initialize as a script method and test default values of instance variables
 #     and outgoing command messages to create piece instance variables.
+#     X - Better to view as simple init of instance variables
+#       - So always pass in nil for anything not used, as if no defaults in tests
+#       - Now simply write code for init with default values in ()
 #
 # - Maybe refactor them for coord. Maybe hash or swap coordinate indexes. Could do later...
 # - Can also think about a ' ' piece for empty squares to send the print_color message, etc.
