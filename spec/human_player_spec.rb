@@ -21,4 +21,26 @@ RSpec.describe HumanPlayer do
       expect(human_player_draw).to_not be_draw_accepted('n')
     end
   end
+
+  describe '#valid_yes_no?' do
+    # Incoming Query Message -> Test value returned
+
+    subject(:human_player_yes_no) { described_class.new }
+
+    it 'returns true for input "y"' do
+      expect(human_player_yes_no).to be_valid_yes_no('y')
+    end
+
+    it 'returns true for input "n"' do
+      expect(human_player_yes_no).to be_valid_yes_no('n')
+    end
+
+    it 'returns false for random input "2n"' do
+      expect(human_player_yes_no).to_not be_valid_yes_no('2n')
+    end
+
+    it 'returns false for random input " hi"' do
+      expect(human_player_yes_no).to_not be_valid_yes_no(' hi')
+    end
+  end
 end
