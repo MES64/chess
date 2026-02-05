@@ -11,4 +11,20 @@ class HumanPlayer
   def valid_yes_no?(user_input)
     %w[y n].include?(user_input)
   end
+
+  def accept_draw?(color)
+    loop do
+      puts "#{color}: Accept the draw? y/n"
+      input = user_input
+      return draw_accepted?(input) if valid_yes_no?(input)
+
+      puts 'Invalid Input!'
+    end
+  end
+
+  private
+
+  def user_input
+    gets.chomp
+  end
 end
