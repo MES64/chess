@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../lib/human_player'
+require_relative '../lib/game'
 
 RSpec.describe HumanPlayer do
   # accept_draw? returns true/false depending on user input ('y'/'n')
@@ -71,6 +72,71 @@ RSpec.describe HumanPlayer do
       allow(human_player_accept).to receive(:valid_yes_no?).and_return(false, false, false, true)
       expect(human_player_accept).to receive(:puts).with('Invalid Input!').exactly(3).times
       human_player_accept.accept_draw?(:white)
+    end
+  end
+
+  describe '#send_to_game' do
+    # Outgoing Command Message -> Test message sent
+    # Note: For error handling (NoMethodError, ArgumentError), I ignore this here since these are
+    # well tested in standard Ruby, and also form an integration test. I shall therefore simply write a
+    # try/catch in #make_move and test the overall effect later
+
+    subject(:human_player_send) { described_class.new }
+
+    let(:game) { instance_double('Game') }
+
+    before do
+      allow(game).to receive(:move)
+      allow(game).to receive(:force_draw)
+      allow(game).to receive(:offer_draw)
+      allow(game).to receive(:resign)
+      allow(game).to receive(:save)
+      allow(game).to receive(:exit)
+    end
+
+    it 'sends move("a2-a3") to game for the command "move a2-a3"' do
+      expect(game).to receive(:move).with('a2-a3')
+      human_player_send.send_to_game(game, 'move a2-a3')
+    end
+
+    it 'sends move("O-O") to game for the command "move O-O"' do
+      expect(game).to receive(:move).with('O-O')
+      human_player_send.send_to_game(game, 'move O-O')
+    end
+
+    it 'sends move("Ra1-a8+") to game for the command "  move    Ra1-a8+   "' do
+      expect(game).to receive(:move).with('Ra1-a8+')
+      human_player_send.send_to_game(game, '  move    Ra1-a8+   ')
+    end
+
+    it 'sends force_draw("50-move") to game for the command "force_draw 50-move"' do
+      expect(game).to receive(:force_draw).with('50-move')
+      human_player_send.send_to_game(game, 'force_draw 50-move')
+    end
+
+    it 'sends offer_draw() to game for the command "offer_draw"' do
+      expect(game).to receive(:offer_draw)
+      human_player_send.send_to_game(game, 'offer_draw')
+    end
+
+    it 'sends resign() to game for the command "resign"' do
+      expect(game).to receive(:resign)
+      human_player_send.send_to_game(game, 'resign')
+    end
+
+    it 'sends save("file-name1") to game for the command "save file-name1"' do
+      expect(game).to receive(:save).with('file-name1')
+      human_player_send.send_to_game(game, 'save file-name1')
+    end
+
+    it 'sends exit() to game for the command "exit"' do
+      expect(game).to receive(:exit)
+      human_player_send.send_to_game(game, 'exit')
+    end
+
+    it 'sends exit("file-name1") to game for the command "exit file-name1"' do
+      expect(game).to receive(:exit).with('file-name1')
+      human_player_send.send_to_game(game, 'exit file-name1')
     end
   end
 end
