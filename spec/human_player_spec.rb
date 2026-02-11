@@ -139,4 +139,79 @@ RSpec.describe HumanPlayer do
       human_player_send.send_to_game(game, 'exit file-name1')
     end
   end
+
+  describe '#make_move' do
+    # Looping Script Method -> Test behavior of loop
+
+    subject(:human_player_move) { described_class.new }
+
+    before do
+      allow(human_player_move).to receive(:puts)
+      allow(human_player_move).to receive(:user_input)
+    end
+
+    let(:game) { instance_double('Game') }
+
+    it 'does not loop when the user input is an accepted command' do
+      allow(human_player_move).to receive(:send_to_game).and_return(true)
+      expect(human_player_move).to_not receive(:puts).with('Enter a command again')
+      human_player_move.make_move(game)
+    end
+
+    it 'loops once when the user input is a rejected, then an accepted command' do
+      allow(human_player_move).to receive(:send_to_game).and_return(false, true)
+      expect(human_player_move).to receive(:puts).with('Enter a command again').once
+      human_player_move.make_move(game)
+    end
+
+    it 'loops 3 times when the user input is a rejected command 3 times, then an accepted command' do
+      allow(human_player_move).to receive(:send_to_game).and_return(false, false, false, true)
+      expect(human_player_move).to receive(:puts).with('Enter a command again').exactly(3).times
+      human_player_move.make_move(game)
+    end
+
+    it 'loops once when the user input gives a NoMethodError, then an accepted command' do
+      call_count = 0
+      allow(human_player_move).to receive(:send_to_game) do
+        call_count += 1
+        call_count == 1 ? raise(NoMethodError) : true
+      end
+
+      expect(human_player_move).to receive(:puts).with('Invalid Command!').once
+      expect(human_player_move).to receive(:puts).with('Enter a command again').once
+      human_player_move.make_move(game)
+    end
+
+    it 'loops once when the user input gives an ArgumentError, then an accepted command' do
+      call_count = 0
+      allow(human_player_move).to receive(:send_to_game) do
+        call_count += 1
+        call_count == 1 ? raise(ArgumentError) : true
+      end
+
+      expect(human_player_move).to receive(:puts).with('Invalid Arguments!').once
+      expect(human_player_move).to receive(:puts).with('Enter a command again').once
+      human_player_move.make_move(game)
+    end
+
+    it 'loops 3 times when the user input gives an ArgumentError, a NoMethodError, a rejected command, then an accepted command' do
+      call_count = 0
+      allow(human_player_move).to receive(:send_to_game) do
+        call_count += 1
+        case call_count
+        when 1
+          raise(ArgumentError)
+        when 2
+          raise(NoMethodError)
+        when 3
+          false
+        else
+          true
+        end
+      end
+
+      expect(human_player_move).to receive(:puts).with('Enter a command again').exactly(3).times
+      human_player_move.make_move(game)
+    end
+  end
 end
