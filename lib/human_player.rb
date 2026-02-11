@@ -4,6 +4,10 @@
 # - making a move with #make_move
 # - responding to a draw request with #accept_draw?
 class HumanPlayer
+  def send_to_game(game, command)
+    game.send(*command.split)
+  end
+
   def draw_accepted?(user_input)
     user_input == 'y'
   end
