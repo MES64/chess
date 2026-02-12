@@ -72,6 +72,28 @@ RSpec.describe Game do
     end
   end
 
+  describe '#update_board' do
+    # Outgoing Command Message -> Test message sent
+
+    let(:board) { instance_double('Board') }
+
+    before do
+      allow(board).to receive(:update)
+    end
+
+    subject(:game_update_board) { described_class.new(board:) }
+
+    it 'sends #update to board with "a2-a3" given the move "a2-a3"' do
+      expect(board).to receive(:update).with('a2-a3')
+      game_update_board.update_board('a2-a3')
+    end
+
+    it 'sends #update to board with "Rh8-h1+" given the move "Rh8-h1+"' do
+      expect(board).to receive(:update).with('Rh8-h1+')
+      game_update_board.update_board('Rh8-h1+')
+    end
+  end
+
   describe '#update_moveset' do
     # Incoming Command Message -> Test change in observable state
 
