@@ -11,6 +11,12 @@ class Game
     @board_class = board_class
   end
 
+  def next_moveset(move)
+    next_board = copy_board
+    update_given_board(next_board, move)
+    next_board.moveset
+  end
+
   def copy_board
     board_class.new(grid: board.grid, castling: board.castling, en_passant: board.en_passant,
                     letter_to_piece: board.letter_to_piece)
