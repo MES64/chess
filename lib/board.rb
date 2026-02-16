@@ -66,6 +66,15 @@ class Board
     { white: color_moveset(:white), black: color_moveset(:black) }
   end
 
+  def king_locations
+    king_locations = {}
+    coords.each do |coord|
+      king_locations[:white] = "#{file(coord)}#{rank(coord)}" if king_at?(coord, :white)
+      king_locations[:black] = "#{file(coord)}#{rank(coord)}" if king_at?(coord, :black)
+    end
+    king_locations
+  end
+
   def update(move)
     update_en_passant(move)
     update_castling(move)
@@ -199,6 +208,12 @@ class Board
     coords
   end
 
+  def king_at?(coord, color)
+    return false unless piece_at?(coord, color)
+
+    grid_at(coord).letter == 'K'
+  end
+
   def grid_at(coord)
     row = grid.length - 1 - coord[1]
     column = coord[0]
@@ -228,5 +243,15 @@ class Board
 
   def print_color(piece)
     piece == ' ' ? '' : "#{piece.print_color};"
+  end
+
+  def file(coord)
+    number_to_letter = %w[a b c d e f g h]
+
+    number_to_letter[coord[0]]
+  end
+
+  def rank(coord)
+    coord[1] + 1
   end
 end
