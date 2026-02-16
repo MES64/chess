@@ -11,10 +11,10 @@ class Game
     @board_class = board_class
   end
 
-  def next_moveset(move)
+  def next_board_info(move)
     next_board = copy_board
     update_given_board(next_board, move)
-    next_board.moveset
+    { moveset: next_board.moveset, king_locations: next_board.king_locations }
   end
 
   def copy_board
