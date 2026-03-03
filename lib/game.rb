@@ -4,12 +4,24 @@
 # It contains methods to update the moveset, result, player turn, and board based on Player
 # commands: #move, #force_draw, #offer_draw, #resign, #save, #exit
 class Game
-  attr_reader :board, :board_class, :moveset
+  attr_reader :board, :board_class, :moveset, :current_player, :check
+  attr_accessor :result
 
-  def initialize(board: nil, moveset: nil, board_class: nil)
-    @board = board
-    @moveset = moveset
-    @board_class = board_class
+  def initialize(**options)
+    @board = options[:board]
+    @moveset = options[:moveset]
+    @result = options[:result]
+    @current_player = options[:current_player]
+    @check = options[:check]
+    @board_class = options[:board_class]
+  end
+
+  def update_result
+    return unless result.nil? && moveset[current_player].empty?
+
+    result = check ? 'Winner' : 'Draw'
+    mates = check ? 'checkmates' : 'stalemates'
+    self.result = "Game Over: #{result}, #{opposite_color(current_player)} #{mates} #{current_player}"
   end
 
   def update_moveset
