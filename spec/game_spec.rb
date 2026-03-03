@@ -932,120 +932,241 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#update_result' do
+    # Incoming Command Message -> Test change in observable state
+
+    context 'when there is one white pawn and one black pawn' do
+      # 8 . . . . . . . .
+      # 7 ♙ . . . . . . .
+      # 6 . . . . . . . .
+      # 5 . . . . . . . .
+      # 4 . . . . . . . .
+      # 3 . . . . . . . .
+      # 2 ♟ . . . . . . .
+      # 1 . . . . . . . .
+      #   a b c d e f g h
+
+      context 'when the initial result is nil' do
+        subject(:game_result_nil) { described_class.new(result: nil, current_player: :white, check: false, moveset: { white: %w[a2-a3 a2-a4], black: %w[a7-a6 a7-a5] }) }
+
+        it 'updates result to be nil' do
+          game_result_nil.update_result
+          actual_result = game_result_nil.result
+          expect(actual_result).to be_nil
+        end
+      end
+
+      context 'when the initial result is set to "Game Over: Draw by 50 moves"' do
+        subject(:game_result_set_draw) { described_class.new(result: 'Game Over: Draw by 50 moves', current_player: :black, check: false, moveset: { white: %w[a2-a3 a2-a4], black: %w[a7-a6 a7-a5] }) }
+
+        it 'leaves result as is' do
+          game_result_set_draw.update_result
+          actual_result = game_result_set_draw.result
+          expect(actual_result).to eql('Game Over: Draw by 50 moves')
+        end
+      end
+
+      context 'when the initial result is set to "Game Over: Black resigns"' do
+        subject(:game_result_set_resign) { described_class.new(result: 'Game Over: Black resigns', current_player: :white, check: false, moveset: { white: %w[a2-a3 a2-a4], black: %w[a7-a6 a7-a5] }) }
+
+        it 'leaves result as is' do
+          game_result_set_resign.update_result
+          actual_result = game_result_set_resign.result
+          expect(actual_result).to eql('Game Over: Black resigns')
+        end
+      end
+    end
+
+    context 'when white stalemates black' do
+      # 8 . . . . . . . ♔
+      # 7 ♜ . . . . . . .
+      # 6 . . . . . ♞ . .
+      # 5 . . . . . . . .
+      # 4 . . . . . . . .
+      # 3 . . . . . . . .
+      # 2 . . . . . . . .
+      # 1 . . . . . . . .
+      #   a b c d e f g h
+
+      let(:moveset) do
+        { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8+
+                    Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7-g7 Ra7-h7+
+                    Nf6-e4 Nf6-g4 Nf6-d5 Nf6-h5 Nf6-d7 Nf6-h7 Nf6-e8 Nf6-g8],
+          black: %w[] }
+      end
+
+      context 'when the initial result is nil' do
+        let(:result) { nil }
+
+        context 'when the current player turn is black' do
+          let(:current_player) { :black }
+
+          subject(:game_result_black_stalemate) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'updates result to be "Game Over: Draw, white stalemates black"' do
+            game_result_black_stalemate.update_result
+            actual_result = game_result_black_stalemate.result
+            expect(actual_result).to eql('Game Over: Draw, white stalemates black')
+          end
+        end
+
+        context 'when the current player turn is white' do
+          let(:current_player) { :white }
+
+          subject(:game_result_white_no_stalemate) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'leaves result as nil' do
+            game_result_white_no_stalemate.update_result
+            actual_result = game_result_white_no_stalemate.result
+            expect(actual_result).to be_nil
+          end
+        end
+      end
+
+      context 'when the initial result is set to "Game Over: Draw by 50 moves"' do
+        let(:result) { 'Game Over: Draw by 50 moves' }
+
+        context 'when the current player turn is black' do
+          let(:current_player) { :black }
+
+          subject(:game_result_black_leave) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'leaves result as is' do
+            game_result_black_leave.update_result
+            actual_result = game_result_black_leave.result
+            expect(actual_result).to eql('Game Over: Draw by 50 moves')
+          end
+        end
+
+        context 'when the current player turn is white' do
+          let(:current_player) { :white }
+
+          subject(:game_result_white_leave) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'leaves result as is' do
+            game_result_white_leave.update_result
+            actual_result = game_result_white_leave.result
+            expect(actual_result).to eql('Game Over: Draw by 50 moves')
+          end
+        end
+      end
+    end
+
+    context 'when black stalemates white' do
+      # 8 . . . . . . . .
+      # 7 . . . . . . . .
+      # 6 . . . . . . . .
+      # 5 . . . . . . . .
+      # 4 . . . . . . . .
+      # 3 . . . . . . ♙ ♙
+      # 2 . . . . ♘ . . .
+      # 1 . . . . . . . ♚
+      #   a b c d e f g h
+
+      let(:moveset) do
+        { white: %w[],
+          black: %w[g3-g2+ h3-h2 Ne2-c1 Ne2-g1 Ne2-c3 Ne2-d4 Ne2-f4] }
+      end
+
+      context 'when the initial result is nil' do
+        let(:result) { nil }
+
+        context 'when the current player turn is black' do
+          let(:current_player) { :black }
+
+          subject(:game_result_black_no_stalemate) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'leaves result as nil' do
+            game_result_black_no_stalemate.update_result
+            actual_result = game_result_black_no_stalemate.result
+            expect(actual_result).to be_nil
+          end
+        end
+
+        context 'when the current player turn is white' do
+          let(:current_player) { :white }
+
+          subject(:game_result_white_stalemate) { described_class.new(result:, current_player:, check: false, moveset:) }
+
+          it 'updates result to be "Game Over: Draw, black stalemates white"' do
+            game_result_white_stalemate.update_result
+            actual_result = game_result_white_stalemate.result
+            expect(actual_result).to eql('Game Over: Draw, black stalemates white')
+          end
+        end
+      end
+    end
+
+    context 'when white checkmates black' do
+      # 8 ♜ . . . . . . ♔
+      # 7 ♜ . . . . . . .
+      # 6 . . . . . . . .
+      # 5 . . . . . . . .
+      # 4 . . . . . . . .
+      # 3 . . . . . . . .
+      # 2 . . . . . . . .
+      # 1 . . . . . . . .
+      #   a b c d e f g h
+
+      let(:moveset) do
+        { white: %w[Ra8-b8+ Ra8-c8+ Ra8-d8+ Ra8-e8+ Ra8-f8+ Ra8-g8+ Ra8xh8
+                    Ra7-b7+ Ra7-c7+ Ra7-d7+ Ra7-e7+ Ra7-f7+ Ra7-g7+ Ra7-h7+
+                    Ra7-a6+ Ra7-a5+ Ra7-a4+ Ra7-a3+ Ra7-a2+ Ra7-a1+],
+          black: %w[] }
+      end
+
+      context 'when the initial result is nil' do
+        let(:result) { nil }
+
+        context 'when the current player turn is black' do
+          let(:current_player) { :black }
+
+          subject(:game_result_black_checkmate) { described_class.new(result:, current_player:, check: true, moveset:) }
+
+          it 'updates result to be "Game Over: Winner, white checkmates black"' do
+            game_result_black_checkmate.update_result
+            actual_result = game_result_black_checkmate.result
+            expect(actual_result).to eql('Game Over: Winner, white checkmates black')
+          end
+        end
+      end
+    end
+
+    context 'when black checkmates white' do
+      # 8 . . . . . . . .
+      # 7 . . . . . . . .
+      # 6 . . . . . . . .
+      # 5 . . . . . . . .
+      # 4 . . . . . . . .
+      # 3 . . . . . ♙ . .
+      # 2 . . . . . . ♕ .
+      # 1 . . . . . . . ♚
+      #   a b c d e f g h
+
+      let(:moveset) do
+        { white: %w[],
+          black: %w[f3-f2+
+                    Qg2xh1 Qg2-f1+ Qg2-h3+
+                    Qg2-a2 Qg2-b2 Qg2-c2 Qg2-d2 Qg2-e2 Qg2-f2 Qg2-h2+
+                    Qg2-g1+ Qg2-g3 Qg2-g4 Qg2-g5 Qg2-g6 Qg2-g7 Qg2-g8] }
+      end
+
+      context 'when the initial result is nil' do
+        let(:result) { nil }
+
+        context 'when the current player turn is white' do
+          let(:current_player) { :white }
+
+          subject(:game_result_white_checkmate) { described_class.new(result:, current_player:, check: true, moveset:) }
+
+          it 'updates result to be "Game Over: Winner, black checkmates white"' do
+            game_result_white_checkmate.update_result
+            actual_result = game_result_white_checkmate.result
+            expect(actual_result).to eql('Game Over: Winner, black checkmates white')
+          end
+        end
+      end
+    end
+  end
 end
-
-# These are for testing #update_result:
-#
-# context 'when white can stalemate black' do
-#       # 8 . . . . ♞ . . ♔
-#       # 7 ♜ . . . . . . .
-#       # 6 . . . . . . . .
-#       # 5 . . . . . . . .
-#       # 4 . . . . . . . .
-#       # 3 . . . . . . . .
-#       # 2 . . . . . . . .
-#       # 1 . . . . . . . .
-#       #   a b c d e f g h
-
-#       let(:board_moveset) do
-#         { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8
-#                     Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7-g7 Ra7-h7
-#                     Ne8-c7 Ne8-g7 Ne8-d6 Ne8-f6],
-#           black: %w[Kh8-g8 Kh8-g7 Kh8-h7] }
-#       end
-
-#       before do
-#         allow(board).to receive(:moveset).and_return(board_moveset)
-
-#         # Rook moves
-#         # Check
-#         allow(game_moveset).to receive(:next_board_info).with('Ra7-h7').and_return(
-#           { moveset: { white: %w[Rh7-h1 Rh7-h2 Rh7-h3 Rh7-h4 Rh7-h5 Rh7-h6 Rh7xh8
-#                                  Rh7-a7 Rh7-b7 Rh7-c7 Rh7-d7 Rh7-e7 Rh7-f7 Rh7-g7
-#                                  Ne8-c7 Ne8-g7 Ne8-d6 Ne8-f6],
-#                        black: %w[Kh8-g8 Kh8-g7 Kh8xh7] },
-#             king_locations: { white: ' ', black: 'h8' } }
-#         )
-#         # Stalemate
-#         allow(game_moveset).to receive(:next_board_info).with('Ra7-g7').and_return(
-#           { moveset: { white: %w[Rg7-g1 Rg7-g2 Rg7-g3 Rg7-g4 Rg7-g5 Rg7-g6 Rg7-g8
-#                                  Rg7-a7 Rg7-b7 Rg7-c7 Rg7-d7 Rg7-e7 Rg7-f7 Rg7-h7
-#                                  Ne8-c7 Ne8-d6 Ne8-f6],
-#                        black: %w[Kh8-g8 Kh8xg7 Kh8-h7] },
-#             king_locations: { white: ' ', black: 'h8' } }
-#         )
-
-#         # King moves (invalid moves)
-#         allow(game_moveset).to receive(:next_board_info).with('Kh8-g7').and_return(
-#           { moveset: { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8
-#                                  Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7xg7
-#                                  Ne8-c7 Ne8xg7 Ne8-d6 Ne8-f6],
-#                        black: %w[Kg7-f6 Kg7-f7 Kg7-f8 Kg7-g6 Kg7-g8 Kg7-h6 Kg7-h7 Kg7-h8] },
-#             king_locations: { white: ' ', black: 'g7' } }
-#         )
-#         allow(game_moveset).to receive(:next_board_info).with('Kh8-h7').and_return(
-#           { moveset: { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8
-#                                  Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7-g7 Ra7xh7
-#                                  Ne8-c7 Ne8-g7 Ne8-d6 Ne8-f6],
-#                        black: %w[Kh7-g6 Kh7-g7 Kh7-g8 Kh7-h6 Kh7-h8] },
-#             king_locations: { white: ' ', black: 'h7' } }
-#         )
-
-#         # Knight moves (stalemate)
-#         allow(game_moveset).to receive(:next_board_info).with('Ne8-f6').and_return(
-#           { moveset: { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8
-#                                  Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7-g7 Ra7-h7
-#                                  Nf6-e4 Nf6-g4 Nf6-d5 Nf6-h5 Nf6-d7 Nf6-h7 Nf6-e8 Nf6-g8],
-#                        black: %w[Kh8-g8 Kh8-g7 Kh8-h7] },
-#             king_locations: { white: ' ', black: 'h8' } }
-#         )
-
-#         # More stubbing...
-#       end
-
-#       let(:expected_moveset) do
-#         { white: %w[Ra7-a1 Ra7-a2 Ra7-a3 Ra7-a4 Ra7-a5 Ra7-a6 Ra7-a8
-#                     Ra7-b7 Ra7-c7 Ra7-d7 Ra7-e7 Ra7-f7 Ra7-g7$ Ra7-h7+
-#                     Ne8-c7 Ne8-g7 Ne8-d6 Ne8-f6$],
-#           black: %w[Kh8-g8] }
-#       end
-
-#       it 'updates the game.moveset to the board.moveset with added stalemate: "Ra7-g7$", "Ne8-f6$" (minus invalid moves & with added check: "Ra7-h7+")' do
-#         game_moveset.update_moveset
-#         actual_moveset = game_moveset.moveset
-#         expect(actual_moveset).to match({ white: contain_exactly(*expected_moveset[:white]), black: contain_exactly(*expected_moveset[:black]) })
-#       end
-#     end
-
-# Black stalemates white
-# 8 ♗ . . . . . . .
-# 7 . . . . . . . .
-# 6 . . . . . . . .
-# 5 . . . . . . . .
-# 4 . . . . . . . .
-# 3 . . . . . . . .
-# 2 . . . . . . . .
-# 1 . . . . . . . ♚
-#   a b c d e f g h
-
-# White checkmates black
-# 8 . . . . . . . ♔
-# 7 ♜ . . . . . . .
-# 6 . . . . . . . .
-# 5 . . . . . . . .
-# 4 . . . . . . . .
-# 3 . . . . . . . .
-# 2 . . . . . . . .
-# 1 . . . . ♜ . . .
-#   a b c d e f g h
-
-# Black checkmates white
-# 8 ♗ . . . . . ♕ .
-# 7 . . . . . . . .
-# 6 . . . . . . . .
-# 5 . . . . . . . .
-# 4 . . . . . . . .
-# 3 . . . . . . . .
-# 2 . . . . . . . .
-# 1 . . . . . . . ♚
-#   a b c d e f g h
