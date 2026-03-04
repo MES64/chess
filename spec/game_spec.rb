@@ -1169,4 +1169,28 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#switch_player_turn' do
+    # Incoming Command Message -> Test change in observable state
+
+    context 'when the initial current_player is :white' do
+      subject(:game_switch_player_white) { described_class.new(current_player: :white) }
+
+      it 'switches the current_player to :black' do
+        game_switch_player_white.switch_player_turn
+        actual_current_player = game_switch_player_white.current_player
+        expect(actual_current_player).to eql(:black)
+      end
+    end
+
+    context 'when the initial current_player is :black' do
+      subject(:game_switch_player_black) { described_class.new(current_player: :black) }
+
+      it 'switches the current_player to :white' do
+        game_switch_player_black.switch_player_turn
+        actual_current_player = game_switch_player_black.current_player
+        expect(actual_current_player).to eql(:white)
+      end
+    end
+  end
 end
