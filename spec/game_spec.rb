@@ -1193,4 +1193,76 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#update_check' do
+    # Incoming Command Message -> Test change in observable state
+
+    context 'when check is initially false' do
+      subject(:game_update_check_false) { described_class.new(check: false) }
+
+      it 'sets check to false for the move "Ra1-a8"' do
+        game_update_check_false.update_check('Ra1-a8')
+        actual_check = game_update_check_false.check
+        expect(actual_check).to eql(false)
+      end
+
+      it 'sets check to false for the move "b2-b4"' do
+        game_update_check_false.update_check('b2-b4')
+        actual_check = game_update_check_false.check
+        expect(actual_check).to eql(false)
+      end
+
+      it 'sets check to true for the move "Ra1-a8+"' do
+        game_update_check_false.update_check('Ra1-a8+')
+        actual_check = game_update_check_false.check
+        expect(actual_check).to eql(true)
+      end
+
+      it 'sets check to true for the move "Qc3-d4+"' do
+        game_update_check_false.update_check('Qc3-d4+')
+        actual_check = game_update_check_false.check
+        expect(actual_check).to eql(true)
+      end
+
+      it 'sets check to true for the move "O-O-O+w"' do
+        game_update_check_false.update_check('O-O-O+w')
+        actual_check = game_update_check_false.check
+        expect(actual_check).to eql(true)
+      end
+    end
+
+    context 'when check is initially true' do
+      subject(:game_update_check_true) { described_class.new(check: true) }
+
+      it 'sets check to false for the move "Ra1-a8"' do
+        game_update_check_true.update_check('Ra1-a8')
+        actual_check = game_update_check_true.check
+        expect(actual_check).to eql(false)
+      end
+
+      it 'sets check to false for the move "b2-b4"' do
+        game_update_check_true.update_check('b2-b4')
+        actual_check = game_update_check_true.check
+        expect(actual_check).to eql(false)
+      end
+
+      it 'sets check to true for the move "Ra1-a8+"' do
+        game_update_check_true.update_check('Ra1-a8+')
+        actual_check = game_update_check_true.check
+        expect(actual_check).to eql(true)
+      end
+
+      it 'sets check to true for the move "Qc3-d4+"' do
+        game_update_check_true.update_check('Qc3-d4+')
+        actual_check = game_update_check_true.check
+        expect(actual_check).to eql(true)
+      end
+
+      it 'sets check to true for the move "O-O-O+w"' do
+        game_update_check_true.update_check('O-O-O+w')
+        actual_check = game_update_check_true.check
+        expect(actual_check).to eql(true)
+      end
+    end
+  end
 end
