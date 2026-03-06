@@ -1265,4 +1265,115 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#format_move' do
+    # Incoming Query Message -> Test value returned
+
+    context 'when the moveset of white (the current player) is ["Ra1-a8+", "h2-h3", "O-O", "O-O-O+"]' do
+      let(:moveset) do
+        { white: %w[Ra1-a8+ h2-h3 O-O O-O-O+],
+          black: %w[] }
+      end
+
+      subject(:game_format_move) { described_class.new(current_player: :white, moveset:) }
+
+      it 'returns nil for the user_move "g2-g3"' do
+        formatted_move = game_format_move.format_move('g2-g3')
+        expect(formatted_move).to be_nil
+      end
+
+      it 'returns "h2-h3" for the user_move "h2-h3"' do
+        formatted_move = game_format_move.format_move('h2-h3')
+        expect(formatted_move).to eql('h2-h3')
+      end
+
+      it 'returns nil for the user_move "h2-h3+"' do
+        formatted_move = game_format_move.format_move('h2-h3+')
+        expect(formatted_move).to be_nil
+      end
+
+      it 'returns "Ra1-a8+" for the user_move "Ra1-a8+"' do
+        formatted_move = game_format_move.format_move('Ra1-a8+')
+        expect(formatted_move).to eql('Ra1-a8+')
+      end
+
+      it 'returns "Ra1-a8+" for the user_move "Ra1-a8"' do
+        formatted_move = game_format_move.format_move('Ra1-a8')
+        expect(formatted_move).to eql('Ra1-a8+')
+      end
+
+      it 'returns "O-Ow" for the user_move "O-O"' do
+        formatted_move = game_format_move.format_move('O-O')
+        expect(formatted_move).to eql('O-Ow')
+      end
+
+      it 'returns "O-O-O+w" for the user_move "O-O-O+"' do
+        formatted_move = game_format_move.format_move('O-O-O+')
+        expect(formatted_move).to eql('O-O-O+w')
+      end
+
+      it 'returns nil for the user_move "O-O+"' do
+        formatted_move = game_format_move.format_move('O-O+')
+        expect(formatted_move).to be_nil
+      end
+
+      it 'returns "O-O-O+w" for the user_move "O-O-O"' do
+        formatted_move = game_format_move.format_move('O-O-O')
+        expect(formatted_move).to eql('O-O-O+w')
+      end
+    end
+
+    context 'when the moveset of white (the current player) is ["Ra1-a8+", "g2-g3"]' do
+      let(:moveset) do
+        { white: %w[Ra1-a8+ g2-g3],
+          black: %w[] }
+      end
+
+      subject(:game_format_move_white) { described_class.new(current_player: :white, moveset:) }
+
+      it 'returns "g2-g3" for the user_move "g2-g3"' do
+        formatted_move = game_format_move_white.format_move('g2-g3')
+        expect(formatted_move).to eql('g2-g3')
+      end
+
+      it 'returns nil for the user_move "h2-h3"' do
+        formatted_move = game_format_move_white.format_move('h2-h3')
+        expect(formatted_move).to be_nil
+      end
+
+      it 'returns nil for the user_move "O-O"' do
+        formatted_move = game_format_move_white.format_move('O-O')
+        expect(formatted_move).to be_nil
+      end
+    end
+
+    context 'when the moveset of black (the current player) is ["Ra1-a8+", "g2-g3", "O-O", "O-O-O+"]' do
+      let(:moveset) do
+        { white: %w[],
+          black: %w[Ra1-a8+ g2-g3 O-O O-O-O+] }
+      end
+
+      subject(:game_format_move_black) { described_class.new(current_player: :black, moveset:) }
+
+      it 'returns "g2-g3" for the user_move "g2-g3"' do
+        formatted_move = game_format_move_black.format_move('g2-g3')
+        expect(formatted_move).to eql('g2-g3')
+      end
+
+      it 'returns nil for the user_move "h2-h3"' do
+        formatted_move = game_format_move_black.format_move('h2-h3')
+        expect(formatted_move).to be_nil
+      end
+
+      it 'returns "O-Ob" for the user_move "O-O"' do
+        formatted_move = game_format_move_black.format_move('O-O')
+        expect(formatted_move).to eql('O-Ob')
+      end
+
+      it 'returns "O-O-O+b" for the user_move "O-O-O+"' do
+        formatted_move = game_format_move_black.format_move('O-O-O+')
+        expect(formatted_move).to eql('O-O-O+b')
+      end
+    end
+  end
 end
