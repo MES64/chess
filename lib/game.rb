@@ -57,6 +57,16 @@ class Game
     board.update(move)
   end
 
+  def format_move(user_move)
+    [user_move, "#{user_move}+"].each do |move|
+      next unless moveset[current_player].include?(move)
+      return "#{move}#{color_string(current_player)}" if move.include?('O-O')
+
+      return move
+    end
+    nil
+  end
+
   private
 
   def validated_moveset(board_moveset, color)
@@ -93,8 +103,11 @@ class Game
   end
 
   def input_move(move, color)
-    color_string = color == :white ? 'w' : 'b'
-    move.include?('O-O') ? "#{move}#{color_string}" : move
+    move.include?('O-O') ? "#{move}#{color_string(color)}" : move
+  end
+
+  def color_string(color)
+    color == :white ? 'w' : 'b'
   end
 
   def add_check(move, next_board_info, color)
