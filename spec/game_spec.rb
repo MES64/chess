@@ -1376,4 +1376,58 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#game_loop' do
+    # Looping Script Method -> Test loop behavior
+
+    let(:board) { instance_double('Board') }
+    let(:player) { instance_double('HumanPlayer') }
+
+    before do
+      allow(board).to receive(:print_board)
+      allow(player).to receive(:make_move)
+    end
+
+    subject(:game_main_loop) { described_class.new(board:, players: { white: player, black: player }) }
+
+    before do
+      allow(game_main_loop).to receive(:puts)
+      allow(game_main_loop).to receive(:update_result)
+      allow(game_main_loop).to receive(:switch_player_turn)
+      allow(game_main_loop).to receive(:current_player).and_return(:white)
+    end
+
+    context 'when the result is immediately updated' do
+      before do
+        allow(game_main_loop).to receive(:result).and_return('Game Over')
+      end
+
+      it 'does not loop and does not puts "Player turn: white"' do
+        expect(game_main_loop).to_not receive(:puts).with('Player turn: white')
+        game_main_loop.game_loop
+      end
+    end
+
+    context 'when the result is nil, then updated' do
+      before do
+        allow(game_main_loop).to receive(:result).and_return(nil, 'Game Over')
+      end
+
+      it 'loops once and puts "Player turn: white" once' do
+        expect(game_main_loop).to receive(:puts).with('Player turn: white').once
+        game_main_loop.game_loop
+      end
+    end
+
+    context 'when the result is nil, nil, nil, then updated' do
+      before do
+        allow(game_main_loop).to receive(:result).and_return(nil, nil, nil, 'Game Over')
+      end
+
+      it 'loops 3 times and puts "Player turn: white" 3 times' do
+        expect(game_main_loop).to receive(:puts).with('Player turn: white').exactly(3).times
+        game_main_loop.game_loop
+      end
+    end
+  end
 end
