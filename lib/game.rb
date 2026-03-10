@@ -4,16 +4,30 @@
 # It contains methods to update the moveset, result, player turn, and board based on Player
 # commands: #move, #force_draw, #offer_draw, #resign, #save, #exit
 class Game
-  attr_reader :board, :board_class, :moveset
+  attr_reader :board, :board_class, :moveset, :players
   attr_accessor :result, :current_player, :check
 
   def initialize(**options)
     @board = options[:board]
     @moveset = options[:moveset]
     @result = options[:result]
+    @players = options[:players]
     @current_player = options[:current_player]
     @check = options[:check]
     @board_class = options[:board_class]
+  end
+
+  def game_loop
+    loop do
+      puts board.print_board(color: current_player)
+      puts
+      update_result
+      return if result
+
+      puts "Player turn: #{current_player}"
+      players[current_player].make_move
+      switch_player_turn
+    end
   end
 
   def update_check(move)
