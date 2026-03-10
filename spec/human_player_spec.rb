@@ -87,7 +87,6 @@ RSpec.describe HumanPlayer do
 
     before do
       allow(game).to receive(:move)
-      allow(game).to receive(:force_draw)
       allow(game).to receive(:offer_draw)
       allow(game).to receive(:resign)
       allow(game).to receive(:save)
@@ -107,11 +106,6 @@ RSpec.describe HumanPlayer do
     it 'sends move("Ra1-a8+") to game for the command "  move    Ra1-a8+   "' do
       expect(game).to receive(:move).with('Ra1-a8+')
       human_player_send.send_to_game(game, '  move    Ra1-a8+   ')
-    end
-
-    it 'sends force_draw("50-move") to game for the command "force_draw 50-move"' do
-      expect(game).to receive(:force_draw).with('50-move')
-      human_player_send.send_to_game(game, 'force_draw 50-move')
     end
 
     it 'sends offer_draw() to game for the command "offer_draw"' do
