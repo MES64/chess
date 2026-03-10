@@ -31,7 +31,7 @@ class Game
       return if result
 
       puts "Player turn: #{current_player}"
-      players[current_player].make_move
+      players[current_player].make_move(self)
       switch_player_turn
     end
   end
