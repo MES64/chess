@@ -67,6 +67,16 @@ class Game
     nil
   end
 
+  def move(user_move)
+    formatted_move = format_move(user_move)
+    return false unless formatted_move
+
+    update_board(formatted_move)
+    update_moveset
+    update_check(formatted_move)
+    true
+  end
+
   private
 
   def validated_moveset(board_moveset, color)
