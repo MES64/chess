@@ -17,6 +17,12 @@ class Game
     @board_class = options[:board_class]
   end
 
+  def play
+    puts 'Game Start'
+    game_loop
+    puts result
+  end
+
   def game_loop
     loop do
       puts board.print_board(color: current_player)
