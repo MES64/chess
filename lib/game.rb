@@ -19,6 +19,7 @@ class Game
 
   def play
     puts 'Game Start'
+    update_moveset
     game_loop
     puts result
   end
