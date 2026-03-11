@@ -1631,6 +1631,49 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#grid_copy' do
+    # Incoming Query Message -> Test value/object returned
+
+    context 'given a random grid' do
+      let(:grid) do
+        [%w[a3 b3 c3],
+         %w[a2 b2 c2],
+         %w[a1 b1 c1]]
+      end
+
+      subject(:board_grid_copy1) { described_class.new(grid:, castling: nil, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that grid' do
+        grid_copy = board_grid_copy1.grid_copy
+        expect(grid_copy).to eql(grid)
+        expect(grid_copy).to_not be(grid)
+        grid_copy.each_index do |index|
+          expect(grid_copy[index]).to_not be(grid[index])
+        end
+      end
+    end
+
+    context 'given a different random grid' do
+      let(:grid) do
+        [%w[d4 e4 f4 g4],
+         %w[d3 e3 f3 g3],
+         %w[d2 e2 f2 g2],
+         %w[d1 e1 f1 g1]]
+      end
+
+      subject(:board_grid_copy2) { described_class.new(grid:, castling: nil, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that grid' do
+        grid_copy = board_grid_copy2.grid_copy
+        expect(grid_copy).to eql(grid)
+        expect(grid_copy).to_not be(grid)
+        grid_copy.each_index do |index|
+          expect(grid_copy[index]).to_not be(grid[index])
+        end
+      end
+    end
+  end
 end
 
 # Notes:
