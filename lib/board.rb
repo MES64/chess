@@ -48,6 +48,10 @@ class Board
     @letter_to_piece = letter_to_piece
   end
 
+  def grid_copy
+    Array.new(grid.length) { |index| Array.new(grid[index]) }
+  end
+
   def off_grid?(coord)
     grid_at(coord).nil?
   end
