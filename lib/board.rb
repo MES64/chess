@@ -79,7 +79,7 @@ class Board
   end
 
   def king_locations
-    king_locations = {}
+    king_locations = { white: ' ', black: ' ' }
     coords.each do |coord|
       king_locations[:white] = "#{file(coord)}#{rank(coord)}" if king_at?(coord, :white)
       king_locations[:black] = "#{file(coord)}#{rank(coord)}" if king_at?(coord, :black)
