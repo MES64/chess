@@ -29,15 +29,15 @@ RSpec.describe Game do
       end
 
       before do
-        allow(board).to receive(:grid).and_return(grid)
-        allow(board).to receive(:castling).and_return(castling)
-        allow(board).to receive(:en_passant).and_return(en_passant)
+        allow(board).to receive(:grid_copy).and_return(grid)
+        allow(board).to receive(:castling_copy).and_return(castling)
+        allow(board).to receive(:en_passant_copy).and_return(en_passant)
         allow(board).to receive(:letter_to_piece).and_return(letter_to_piece)
       end
 
       subject(:game_copy) { described_class.new(board:, board_class:) }
 
-      it 'sends new to the Board class with the same instance variable values as the original board' do
+      it 'sends new to the Board class with deep copies of instance variables of original board' do
         expect(board_class).to receive(:new).with(grid:, castling:, en_passant:, letter_to_piece:)
         game_copy.copy_board
       end
@@ -58,15 +58,15 @@ RSpec.describe Game do
       end
 
       before do
-        allow(board).to receive(:grid).and_return(grid)
-        allow(board).to receive(:castling).and_return(castling)
-        allow(board).to receive(:en_passant).and_return(en_passant)
+        allow(board).to receive(:grid_copy).and_return(grid)
+        allow(board).to receive(:castling_copy).and_return(castling)
+        allow(board).to receive(:en_passant_copy).and_return(en_passant)
         allow(board).to receive(:letter_to_piece).and_return(letter_to_piece)
       end
 
       subject(:game_copy) { described_class.new(board:, board_class:) }
 
-      it 'sends new to the Board class with the same instance variable values as the original board' do
+      it 'sends new to the Board class with deep copies of instance variables of original board' do
         expect(board_class).to receive(:new).with(grid:, castling:, en_passant:, letter_to_piece:)
         game_copy.copy_board
       end
