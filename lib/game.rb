@@ -66,7 +66,7 @@ class Game
   end
 
   def copy_board
-    board_class.new(grid: board.grid, castling: board.castling, en_passant: board.en_passant,
+    board_class.new(grid: board.grid_copy, castling: board.castling_copy, en_passant: board.en_passant_copy,
                     letter_to_piece: board.letter_to_piece)
   end
 
