@@ -1630,6 +1630,63 @@ RSpec.describe Board do
         expect(board_king_locations2.king_locations).to match({ white: 'f4', black: 'b2' })
       end
     end
+
+    context 'when the white King is on f4 and there is no black King' do
+      let(:grid) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', white_pawn, ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', white_king, ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', black_rook],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_king_locations_white) { described_class.new(grid:, castling: nil, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns { white: "f4", black: " " }' do
+        expect(board_king_locations_white.king_locations).to match({ white: 'f4', black: ' ' })
+      end
+    end
+
+    context 'when there is no white king and the black King is on b2' do
+      let(:grid) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', white_pawn, ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', black_king, ' ', ' ', ' ', ' ', ' ', black_rook],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_king_locations_black) { described_class.new(grid:, castling: nil, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns { white: " ", black: "b2" }' do
+        expect(board_king_locations_black.king_locations).to match({ white: ' ', black: 'b2' })
+      end
+    end
+
+    context 'when there are no kings' do
+      let(:grid) do
+        [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', white_pawn, ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', black_rook],
+         [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']]
+      end
+
+      subject(:board_king_locations_none) { described_class.new(grid:, castling: nil, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns { white: " ", black: " " }' do
+        expect(board_king_locations_none.king_locations).to match({ white: ' ', black: ' ' })
+      end
+    end
   end
 
   describe '#grid_copy' do
