@@ -56,6 +56,10 @@ class Board
     { white: Array.new(castling[:white]), black: Array.new(castling[:black]) }
   end
 
+  def en_passant_copy
+    { white: Array.new(en_passant[:white]), black: Array.new(en_passant[:black]) }
+  end
+
   def off_grid?(coord)
     grid_at(coord).nil?
   end
