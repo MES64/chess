@@ -1706,6 +1706,38 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#en_passant_copy' do
+    # Incoming Query Message -> Test value/object returned
+
+    context 'given a random en_passant hash' do
+      let(:en_passant) { { white: %w[e5xf6 g5xf6], black: [] } }
+
+      subject(:board_en_passant_copy1) { described_class.new(grid: nil, castling: nil, en_passant:, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that en_passant hash' do
+        en_passant_copy = board_en_passant_copy1.en_passant_copy
+        expect(en_passant_copy).to eql(en_passant)
+        expect(en_passant_copy).to_not be(en_passant)
+        expect(en_passant_copy[:white]).to_not be(en_passant[:white])
+        expect(en_passant_copy[:black]).to_not be(en_passant[:black])
+      end
+    end
+
+    context 'given a different random en_passant hash' do
+      let(:en_passant) { { white: [], black: ['c4xd3'] } }
+
+      subject(:board_en_passant_copy2) { described_class.new(grid: nil, castling: nil, en_passant:, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that en_passant hash' do
+        en_passant_copy = board_en_passant_copy2.en_passant_copy
+        expect(en_passant_copy).to eql(en_passant)
+        expect(en_passant_copy).to_not be(en_passant)
+        expect(en_passant_copy[:white]).to_not be(en_passant[:white])
+        expect(en_passant_copy[:black]).to_not be(en_passant[:black])
+      end
+    end
+  end
 end
 
 # Notes:
