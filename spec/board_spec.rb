@@ -1674,6 +1674,38 @@ RSpec.describe Board do
       end
     end
   end
+
+  describe '#castling_copy' do
+    # Incoming Query Message -> Test value/object returned
+
+    context 'given a random castling hash' do
+      let(:castling) { { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] } }
+
+      subject(:board_castling_copy1) { described_class.new(grid: nil, castling:, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that castling hash' do
+        castling_copy = board_castling_copy1.castling_copy
+        expect(castling_copy).to eql(castling)
+        expect(castling_copy).to_not be(castling)
+        expect(castling_copy[:white]).to_not be(castling[:white])
+        expect(castling_copy[:black]).to_not be(castling[:black])
+      end
+    end
+
+    context 'given a different random castling hash' do
+      let(:castling) { { white: ['O-O-O'], black: [] } }
+
+      subject(:board_castling_copy2) { described_class.new(grid: nil, castling:, en_passant: nil, letter_to_piece: nil) }
+
+      it 'returns a deep copy of that castling hash' do
+        castling_copy = board_castling_copy2.castling_copy
+        expect(castling_copy).to eql(castling)
+        expect(castling_copy).to_not be(castling)
+        expect(castling_copy[:white]).to_not be(castling[:white])
+        expect(castling_copy[:black]).to_not be(castling[:black])
+      end
+    end
+  end
 end
 
 # Notes:
