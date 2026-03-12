@@ -32,6 +32,7 @@ class Game
       return if result
 
       puts "Player turn: #{current_player}"
+      puts 'Check!' if check
       players[current_player].make_move(self)
       switch_player_turn
     end
