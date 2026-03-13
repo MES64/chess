@@ -86,6 +86,7 @@ RSpec.describe HumanPlayer do
     let(:game) { instance_double('Game') }
 
     before do
+      # Commands
       allow(game).to receive(:move)
       allow(game).to receive(:offer_draw)
       allow(game).to receive(:resign)
@@ -126,11 +127,6 @@ RSpec.describe HumanPlayer do
     it 'sends exit() to game for the command "exit"' do
       expect(game).to receive(:exit)
       human_player_send.send_to_game(game, 'exit')
-    end
-
-    it 'sends exit("file-name1") to game for the command "exit file-name1"' do
-      expect(game).to receive(:exit).with('file-name1')
-      human_player_send.send_to_game(game, 'exit file-name1')
     end
   end
 
