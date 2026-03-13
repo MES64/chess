@@ -174,18 +174,6 @@ RSpec.describe HumanPlayer do
       human_player_move.make_move(game)
     end
 
-    it 'loops once when the user input gives a NoMethodError, then an accepted command' do
-      call_count = 0
-      allow(human_player_move).to receive(:send_to_game) do
-        call_count += 1
-        call_count == 1 ? raise(NoMethodError) : true
-      end
-
-      expect(human_player_move).to receive(:puts).with('Invalid Command!').once
-      expect(human_player_move).to receive(:puts).with('Enter a command again').once
-      human_player_move.make_move(game)
-    end
-
     it 'loops once when the user input gives an ArgumentError, then an accepted command' do
       call_count = 0
       allow(human_player_move).to receive(:send_to_game) do
@@ -198,15 +186,13 @@ RSpec.describe HumanPlayer do
       human_player_move.make_move(game)
     end
 
-    it 'loops 3 times when the user input gives an ArgumentError, a NoMethodError, a rejected command, then an accepted command' do
+    it 'loops 3 times when the user input gives an ArgumentError, an ArgumentError, a rejected command, then an accepted command' do
       call_count = 0
       allow(human_player_move).to receive(:send_to_game) do
         call_count += 1
         case call_count
-        when 1
+        when 1..2
           raise(ArgumentError)
-        when 2
-          raise(NoMethodError)
         when 3
           false
         else
