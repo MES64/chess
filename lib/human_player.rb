@@ -11,8 +11,6 @@ class HumanPlayer
       return if done
 
       puts 'Enter a command again'
-    rescue NoMethodError
-      output_invalid_command
     rescue ArgumentError
       output_invalid_arguments
     end
@@ -46,11 +44,6 @@ class HumanPlayer
 
   def user_input
     gets.chomp
-  end
-
-  def output_invalid_command
-    puts 'Invalid Command!'
-    puts 'Enter a command again'
   end
 
   def output_invalid_arguments
