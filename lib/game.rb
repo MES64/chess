@@ -99,6 +99,15 @@ class Game
     true
   end
 
+  def offer_draw
+  end
+
+  def resign
+  end
+
+  def save(file_name)
+  end
+
   private
 
   def validated_moveset(board_moveset, color)
