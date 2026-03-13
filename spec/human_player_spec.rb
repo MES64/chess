@@ -92,6 +92,10 @@ RSpec.describe HumanPlayer do
       allow(game).to receive(:resign)
       allow(game).to receive(:save)
       allow(game).to receive(:exit)
+
+      # Not commands
+      allow(game).to receive(:puts)
+      allow(game).to receive(:play)
     end
 
     it 'sends move("a2-a3") to game for the command "move a2-a3"' do
@@ -127,6 +131,16 @@ RSpec.describe HumanPlayer do
     it 'sends exit() to game for the command "exit"' do
       expect(game).to receive(:exit)
       human_player_send.send_to_game(game, 'exit')
+    end
+
+    it 'does not send puts("hi") to game for the non-command "puts hi"' do
+      expect(game).to_not receive(:puts).with('hi')
+      human_player_send.send_to_game(game, 'puts hi')
+    end
+
+    it 'does not send play() to game for the non-command "play"' do
+      expect(game).to_not receive(:play)
+      human_player_send.send_to_game(game, 'play')
     end
   end
 
