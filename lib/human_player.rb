@@ -19,7 +19,9 @@ class HumanPlayer
   end
 
   def send_to_game(game, command)
-    game.send(*command.split)
+    message_with_args = command.split
+    message = message_with_args[0]
+    game.send(*message_with_args) if %w[move offer_draw resign save exit].include?(message)
   end
 
   def draw_accepted?(user_input)
