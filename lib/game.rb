@@ -107,6 +107,8 @@ class Game
   end
 
   def resign
+    update_result_to_resign
+    true
   end
 
   def save(file_name)
