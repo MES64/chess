@@ -1455,4 +1455,26 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#update_result_to_draw' do
+    # Incoming Command Message -> Test change in observable state
+
+    subject(:game_draw) { described_class.new(result: nil) }
+
+    context 'when the draw is accepted' do
+      let(:draw_accepted) { true }
+      it 'sets result to "Game Over: Draw accepted"' do
+        game_draw.update_result_to_draw(draw_accepted)
+        expect(game_draw.result).to eql('Game Over: Draw accepted')
+      end
+    end
+
+    context 'when the draw is not accepted' do
+      let(:draw_accepted) { false }
+      it 'leaves the result as nil' do
+        game_draw.update_result_to_draw(draw_accepted)
+        expect(game_draw.result).to be_nil
+      end
+    end
+  end
 end
