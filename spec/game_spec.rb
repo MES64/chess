@@ -1477,4 +1477,28 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#opposite_color' do
+    # Incoming Query Message -> Test value returned
+
+    subject(:game_opposite_color) { described_class.new }
+
+    context 'when the color is white' do
+      let(:color) { :white }
+
+      it 'returns the color black' do
+        opposite_color = game_opposite_color.opposite_color(color)
+        expect(opposite_color).to eql(:black)
+      end
+    end
+
+    context 'when the color is black' do
+      let(:color) { :black }
+
+      it 'returns the color white' do
+        opposite_color = game_opposite_color.opposite_color(color)
+        expect(opposite_color).to eql(:white)
+      end
+    end
+  end
 end
