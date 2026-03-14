@@ -58,6 +58,10 @@ class Game
     self.result = "Game Over: #{current_player} resigns"
   end
 
+  def update_result_to_draw(draw_accepted)
+    self.result = 'Game Over: Draw accepted' if draw_accepted
+  end
+
   def update_moveset
     board_moveset = board.moveset
     moveset[:white] = validated_moveset(board_moveset, :white)
