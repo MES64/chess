@@ -54,6 +54,10 @@ class Game
     self.result = "Game Over: #{result}, #{opposite_color(current_player)} #{mates} #{current_player}"
   end
 
+  def update_result_to_resign
+    self.result = "Game Over: #{current_player} resigns"
+  end
+
   def update_moveset
     board_moveset = board.moveset
     moveset[:white] = validated_moveset(board_moveset, :white)
