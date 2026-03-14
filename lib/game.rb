@@ -112,6 +112,11 @@ class Game
   end
 
   def offer_draw
+    other_color = opposite_color(current_player)
+    other_player = players[other_color]
+    draw_accepted = other_player.accept_draw?(other_color)
+    update_result_to_draw(draw_accepted)
+    draw_accepted
   end
 
   def resign
