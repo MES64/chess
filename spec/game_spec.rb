@@ -1431,4 +1431,28 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe '#update_result_to_resign' do
+    # Incoming Command Message -> Test change in observable state
+
+    context 'when the current player turn is white' do
+      subject(:game_resign_white) { described_class.new(current_player: :white, result: nil) }
+
+      it 'sets result to "Game Over: white resigns"' do
+        game_resign_white.update_result_to_resign
+        actual_result = game_resign_white.result
+        expect(actual_result).to eql('Game Over: white resigns')
+      end
+    end
+
+    context 'when the current player turn is black' do
+      subject(:game_resign_black) { described_class.new(current_player: :black, result: nil) }
+
+      it 'sets result to "Game Over: black resigns"' do
+        game_resign_black.update_result_to_resign
+        actual_result = game_resign_black.result
+        expect(actual_result).to eql('Game Over: black resigns')
+      end
+    end
+  end
 end
