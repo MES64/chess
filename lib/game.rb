@@ -97,6 +97,10 @@ class Game
     nil
   end
 
+  def opposite_color(color)
+    color == :white ? :black : :white
+  end
+
   def move(user_move)
     formatted_move = format_move(user_move)
     return false unless formatted_move
@@ -187,9 +191,5 @@ class Game
     y_coord = color == :white ? 0 : 7
     x_coords = move == 'O-O' ? [5, 6] : [1, 2, 3]
     x_coords.any? { |x_coord| !board.empty_at?([x_coord, y_coord]) }
-  end
-
-  def opposite_color(color)
-    color == :white ? :black : :white
   end
 end
