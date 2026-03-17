@@ -29,18 +29,7 @@ class Board
     black: { 'B' => BLACK_BISHOP, 'N' => BLACK_KNIGHT, 'R' => BLACK_ROOK, 'Q' => BLACK_QUEEN }
   }.freeze
 
-  DEFAULT_GRID = [
-    [BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
-    [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
-    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
-    [WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK]
-  ].freeze
-
-  def initialize(grid: DEFAULT_GRID, castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] },
+  def initialize(grid: default_grid, castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] },
                  en_passant: { white: [], black: [] }, letter_to_piece: DEFAULT_LETTER_TO_PIECE)
     @grid = grid
     @castling = castling
@@ -265,5 +254,16 @@ class Board
 
   def rank(coord)
     coord[1] + 1
+  end
+
+  def default_grid
+    [[BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
+     [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
+     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+     [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
+     [WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK]]
   end
 end
