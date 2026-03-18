@@ -2,7 +2,7 @@
 
 # Game contains all the info to have a game of chess: Board, Players, result, etc.
 # It contains methods to update the moveset, result, player turn, and board based on Player
-# commands: #move, #force_draw, #offer_draw, #resign, #save, #exit
+# commands: #move, #offer_draw, #resign, #save, #exit
 class Game
   attr_reader :board, :board_class, :moveset
   attr_accessor :result, :current_player, :check, :players

@@ -4,7 +4,7 @@ require_relative 'piece'
 require_relative 'pawn'
 
 # Board contains the grid of chess pieces, along with en passant and castling information
-# Methods: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
+# Methods include: #print_board, #update, #moveset, #piece_at?, #empty_at?, #off_grid?
 # I would ideally shorten this class, possibly by making a separate grid class
 class Board
   attr_reader :grid, :castling, :letter_to_piece

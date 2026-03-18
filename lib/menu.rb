@@ -6,9 +6,9 @@ require_relative 'human_player'
 require_relative 'computer_player'
 
 # Menu is responsible for the user setting up a game, by either:
-# - Choosing whether white/black is a human player or a computer player in a new game
-# - Loading a previously saved game
-# Menu can also exit the program
+# - Choosing whether white/black is a human player or a computer player in a new game with #play
+# - Loading a previously saved game with #load
+# Menu can also exit the program with #exit
 class Menu
   PLAYER_TYPE = { 'human' => HumanPlayer.new, 'computer' => ComputerPlayer.new }.freeze
 
