@@ -12,6 +12,8 @@ Here is a nice summary of the rules, which this program also uses: https://www.c
 
 If the link does not work then do a basic Google search, should you want to learn the rules yourself. 
 
+I did all of the chess logic via Test-Driven Development (TDD), only writing the ComputerPlayer, Menu, and save/load features without using TDD. 
+
 From The Odin Project: https://www.theodinproject.com/lessons/ruby-ruby-final-project
 
 ## Input
