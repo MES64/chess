@@ -2,7 +2,7 @@
 
 The game Chess that is played on the command line. It works for both human and computer players (using a very basic AI picking moves at random). The game can be saved to a file and resumed later.
 
-The game is set up in the menu, where the game can be loaded or a new one created. Once the game begins players take turns playing Chess until the game is over or the game is exited. This returns the user to the menu to play again or completely close the program.
+The game is set up in the menu, where the game can be loaded or a new one created. Once the game begins players take turns playing Chess until the game is over or the program is exited. Game over returns the user to the menu to play again or exit the program.
 
 Here is a nice summary of the rules, which this program also uses: https://www.chessvariants.org/d.chess/chess.html
 
@@ -21,17 +21,17 @@ This makes for easier transfer of information from human to computer (with no pi
 #### Examples: 
 - e2-e4
 - Ng1-f3
-- Bf8-b4+
+- Bf8-b4
 - Bb5xc6
 - 0-0
 - 0-0-0
-- Ng8-f6#
+- Ng8-f6
 - h7-h8=Q
-- h7xg8=N#
+- h7xg8=N
 
 #### Form:
 
-[piece]start[-/x]end[=promotion/''][+/#/'']
+[piece]start[-/x]end[=promotion/'']
 
 #### Pieces:
 - '' = Pawn
@@ -57,8 +57,6 @@ This makes for easier transfer of information from human to computer (with no pi
 - \- means normal move (no taking)
 - x means moving to take an opponent piece
 - =promotion indicates the pawn promotion option: =Q, =R, =N, =B
-- \+ means check (not required for input)
-- \# means mate (not required for input)
 - '' indicates nothing
 - 0-0 = Castle king-side
 - 0-0-0 = Castle queen-side
@@ -70,36 +68,31 @@ This makes for easier transfer of information from human to computer (with no pi
 
 command argument1 argument2 ...
 
-Below, [parameter = argument, ...] is used to explain what the parameter is and the constraints of the arguments. The parameter is omitted when typing out the arguments to the terminal. 
+Below, [parameter = argument, ...] is used to explain what the parameter is and examples of the arguments. The parameter is omitted when typing out the arguments to the terminal.
 
 #### Game Commands:
-- move [move = Ng1-f3, etc.]
-- force-draw [condition = 3-fold/50-move]
+- move [move = Ng1-f3]
 - offer-draw
 - resign
-- save [file_name]
-- exit [optional: file_name]
+- save [file_name = my-game]
+- exit
 
 #### Menu Commands:
-- load [file_name]
-- delete [file_name]
-- close
-- play [player1 = human/pc, player2 = human/pc, optional: random_color = random_color]
-
-Note: All file names must use alphanumeric characters and - only.
+- play [player1 = human/computer, player2 = human/computer]
+- load [file_name = my-game]
+- exit
 
 #### Examples: 
 - move Ng1-f3
-- exit my-game
-- play human pc
+- save my-game
+- play human computer
 - resign
 
 #### Invalid Input:
 - Any commands not listed here
-- Missing required arguments
+- Missing arguments
 - Too many arguments
 - Invalid arguments (including moves in the incorrect format or invalid for the current state of the game)
-- Extra space at the start, end, and between command/argument strings
 
 ## Output
 
@@ -107,6 +100,6 @@ The board is printed to the terminal after each move, making use of Chess symbol
 
 Background colors are used to create the checker pattern of the board.
 
-Other things are printed too, such as declaring check/mate, user input instructions, etc.
+Other things are printed too, such as declaring check/mate.
 
 Lastly, save files can be saved to your file system.
