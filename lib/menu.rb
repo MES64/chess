@@ -8,7 +8,7 @@ require_relative 'computer_player'
 # Menu is responsible for the user setting up a game, by either:
 # - Choosing whether white/black is a human player or a computer player in a new game
 # - Loading a previously saved game
-# Menu can also delete any saved game and exit the program
+# Menu can also exit the program
 class Menu
   PLAYER_TYPE = { 'human' => HumanPlayer.new, 'computer' => ComputerPlayer.new }.freeze
 
@@ -35,7 +35,7 @@ class Menu
   def send_to_menu(command)
     message_with_args = command.split
     message = message_with_args[0]
-    send(*message_with_args) if %w[play load delete exit].include?(message)
+    send(*message_with_args) if %w[play load exit].include?(message)
   end
 
   def user_input
@@ -76,8 +76,5 @@ class Menu
     game.deserialize(game_string, PLAYER_TYPE)
     game.play
     true
-  end
-
-  def delete(file_name)
   end
 end
