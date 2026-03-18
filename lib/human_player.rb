@@ -4,6 +4,12 @@
 # - making a move with #make_move
 # - responding to a draw request with #accept_draw?
 class HumanPlayer
+  attr_reader :type
+
+  def initialize
+    @type = 'human'
+  end
+
   def make_move(game)
     puts 'Enter a command'
     loop do

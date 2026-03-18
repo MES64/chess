@@ -24,13 +24,15 @@ class Board
   BLACK_QUEEN = Piece.new(color: :black, letter: 'Q')
   BLACK_KING = Piece.new(color: :black, letter: 'K')
 
-  DEFAULT_LETTER_TO_PIECE = {
-    white: { 'B' => WHITE_BISHOP, 'N' => WHITE_KNIGHT, 'R' => WHITE_ROOK, 'Q' => WHITE_QUEEN },
-    black: { 'B' => BLACK_BISHOP, 'N' => BLACK_KNIGHT, 'R' => BLACK_ROOK, 'Q' => BLACK_QUEEN }
+  LETTER_TO_PIECE = {
+    white: { 'B' => WHITE_BISHOP, 'N' => WHITE_KNIGHT, 'R' => WHITE_ROOK, 'Q' => WHITE_QUEEN, 'K' => WHITE_KING,
+             '' => WHITE_PAWN },
+    black: { 'B' => BLACK_BISHOP, 'N' => BLACK_KNIGHT, 'R' => BLACK_ROOK, 'Q' => BLACK_QUEEN, 'K' => BLACK_KING,
+             '' => BLACK_PAWN }
   }.freeze
 
   def initialize(grid: default_grid, castling: { white: ['O-O', 'O-O-O'], black: ['O-O', 'O-O-O'] },
-                 en_passant: { white: [], black: [] }, letter_to_piece: DEFAULT_LETTER_TO_PIECE)
+                 en_passant: { white: [], black: [] }, letter_to_piece: LETTER_TO_PIECE)
     @grid = grid
     @castling = castling
     @en_passant = en_passant
@@ -113,7 +115,61 @@ class Board
     "#{board_string}  #{letters}\n"
   end
 
+  def serialize
+    JSON.dump({
+                grid: grid_array,
+                castling: castling,
+                en_passant: en_passant
+              })
+  end
+
+  def deserialize(board_string)
+    board_hash = JSON.parse(board_string)
+    deserialize_grid(board_hash['grid'])
+    deserialize_castling(board_hash['castling'])
+    deserialize_en_passant(board_hash['en_passant'])
+  end
+
   private
+
+  def deserialize_en_passant(en_passant_hash)
+    en_passant[:white] = en_passant_hash['white']
+    en_passant[:black] = en_passant_hash['black']
+  end
+
+  def deserialize_castling(castling_hash)
+    castling[:white] = castling_hash['white']
+    castling[:black] = castling_hash['black']
+  end
+
+  def deserialize_grid(grid_array)
+    blank_grid
+    fill_board(grid_array)
+  end
+
+  def blank_grid
+    coords.each do |coord|
+      grid_put(' ', coord)
+    end
+  end
+
+  def fill_board(grid_array)
+    grid_array.each do |(coord, color, letter)|
+      piece = letter_to_piece[color.to_sym][letter]
+      grid_put(piece, coord)
+    end
+  end
+
+  def grid_array
+    pieces = []
+    coords.each do |coord|
+      next if empty_at?(coord)
+
+      piece = grid_at(coord)
+      pieces << [coord, piece.color, piece.letter]
+    end
+    pieces
+  end
 
   def add_en_passant(move)
     left_coord = left_coord_of_moved_pawn(move)

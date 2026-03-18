@@ -10,6 +10,8 @@ require_relative 'computer_player'
 # - Loading a previously saved game
 # Menu can also delete any saved game and exit the program
 class Menu
+  PLAYER_TYPE = { 'human' => HumanPlayer.new, 'computer' => ComputerPlayer.new }.freeze
+
   def start
     loop { enter_command }
   end
@@ -45,9 +47,15 @@ class Menu
     puts 'Enter a command again'
   end
 
+  def read_file(file_path)
+    File.open(file_path, 'r') { |file| file.gets.chomp }
+  rescue StandardError
+    puts 'Error, unable to load!'
+    false
+  end
+
   def play(white_player, black_player)
-    player_type = { 'human' => HumanPlayer.new, 'computer' => ComputerPlayer.new }
-    players = { white: player_type[white_player], black: player_type[black_player] }
+    players = { white: PLAYER_TYPE[white_player], black: PLAYER_TYPE[black_player] }
 
     return false unless players[:white] && players[:black]
 
@@ -61,6 +69,13 @@ class Menu
   end
 
   def load(file_name)
+    game_string = read_file("./game_saves/#{file_name}.json")
+    return false unless game_string
+
+    game = Game.new(board: Board.new, moveset: { white: [], black: [] }, board_class: Board)
+    game.deserialize(game_string, PLAYER_TYPE)
+    game.play
+    true
   end
 
   def delete(file_name)

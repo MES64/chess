@@ -4,8 +4,8 @@
 # It contains methods to update the moveset, result, player turn, and board based on Player
 # commands: #move, #force_draw, #offer_draw, #resign, #save, #exit
 class Game
-  attr_reader :board, :board_class, :moveset, :players
-  attr_accessor :result, :current_player, :check
+  attr_reader :board, :board_class, :moveset
+  attr_accessor :result, :current_player, :check, :players
 
   def initialize(**options)
     @board = options[:board]
@@ -125,9 +125,36 @@ class Game
   end
 
   def save(file_name)
+    file_path = "./game_saves/#{file_name}.json"
+    File.open(file_path, 'w') { |file| file.puts serialize }
+    puts 'Game saved'
+    false
+  rescue StandardError
+    puts 'Error, unable to save!'
+    false
+  end
+
+  def deserialize(game_string, player_type)
+    game_hash = JSON.parse(game_string)
+    board.deserialize(game_hash['board'])
+
+    players = game_hash['players']
+    self.players = { white: player_type[players['white']], black: player_type[players['black']] }
+
+    self.current_player = game_hash['current_player'].to_sym
+    self.check = game_hash['check']
   end
 
   private
+
+  def serialize
+    JSON.dump({
+                board: board.serialize,
+                players: { white: players[:white].type, black: players[:black].type },
+                current_player: current_player,
+                check: check
+              })
+  end
 
   def validated_moveset(board_moveset, color)
     moveset = []

@@ -4,9 +4,11 @@
 # - making a move with #make_move
 # - responding to a draw request with #accept_draw?
 class ComputerPlayer
+  attr_reader :type
   attr_accessor :turn_count
 
   def initialize
+    @type = 'computer'
     @turn_count = 0
   end
 
