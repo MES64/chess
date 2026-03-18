@@ -1,5 +1,9 @@
 # Chess
 
+Play here: https://codesandbox.io/p/github/MES64/chess/main
+
+You will have to create your own account on CodeSandbox, fork the repo, and open the terminal with Ctrl + ` to type: ruby main.rb. Commands are listed below.
+
 The game Chess that is played on the command line. It works for both human and computer players (using a very basic AI picking moves at random). The game can be saved to a file and resumed later.
 
 The game is set up in the menu, where the game can be loaded or a new one created. Once the game begins players take turns playing Chess until the game is over or the program is exited. Game over returns the user to the menu to play again or exit the program.
